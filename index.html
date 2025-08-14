@@ -1,0 +1,3042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Medieval Life — Bitlike Starter</title>
+<style>
+  :root{
+    --bg:#0e0f12;--panel:#161821;--soft:#1c1f2a;--muted:#a7a9b8;--text:#f3f5fa;
+    --accent:#7cc36f;--gold:#f2c94c;--danger:#ff6b6b;--good:#78ffd6;--radius:14px;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:linear-gradient(180deg,#0b0c10,#0f1117);color:var(--text);
+       font:15px/1.45 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif}
+  header{position:sticky;top:0;z-index:5;background:#0d0f15d0;backdrop-filter:blur(8px);
+         border-bottom:1px solid #1f2230;padding:10px 14px;display:flex;gap:10px;align-items:center}
+  header .tag{display:inline-flex;align-items:center;gap:6px;background:#141725;border:1px solid #262a3a;
+              border-radius:999px;padding:2px 8px;font-size:12px;color:#dfe1ee}
+  header .spacer{flex:1}
+  main{display:grid;grid-template-columns:280px 1fr 320px;gap:12px;padding:12px}
+  @media (max-width:1050px){main{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,#171a24,#121420);border:1px solid #23283a;border-radius:var(--radius);box-shadow:0 10px 30px #00000040}
+  .c{padding:12px}
+  h2{margin:0 0 8px 0;font-size:16px}
+  .row{display:flex;gap:8px;align-items:center;justify-content:space-between;margin:6px 0}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+  .bar{height:10px;background:#20232f;border:1px solid #2b3147;border-radius:10px;overflow:hidden}
+  .bar>i{display:block;height:100%;background:linear-gradient(90deg,#7cc36f,#9fe398)}
+  .mini{font-size:12px;color:var(--muted)}
+  button,select{background:#131622;color:var(--text);border:1px solid #2a3046;border-radius:10px;padding:8px 10px;cursor:pointer}
+  button:hover{filter:brightness(1.06)}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .pill{display:inline-block;border:1px solid #2a3046;border-radius:999px;padding:2px 8px;margin:2px;font-size:12px}
+  .gold{color:var(--gold)}
+  .danger{color:var(--danger)}
+  .good{color:var(--good)}
+  .log{height:240px;overflow:auto;padding:8px;border:1px solid #23283a;border-radius:10px;background:#0e1018}
+  .choices{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .hr{height:1px;background:#242a3d;margin:8px 0;border:0}
+  .sectionLabel{font-weight:600;font-size:13px;color:#cbd1e7;margin:6px 0 4px}
+  .list{display:grid;grid-template-columns:1fr auto;gap:6px;align-items:center}
+  .kbd{font:12px/1.2 ui-monospace,SFMono-Regular,Menlo,monospace;border:1px solid #2a3046;background:#121423;
+       border-radius:6px;padding:2px 6px;color:#dfe3f7}
+  .notice{padding:8px;border:1px dashed #2a3046;border-radius:10px;background:#10131e;color:#c9cfe6;font-size:13px}
+</style>
+</head>
+<body>
+<header>
+  <strong>🕮 Medieval Life — Bitlike Starter</strong>
+  <span id="tagName" class="tag">Name</span>
+  <span id="tagAge" class="tag">0 yrs</span>
+  <span id="tagYear" class="tag">Year 1200</span>
+  <span id="tagClass" class="tag">Peasant</span>
+  <div class="spacer"></div>
+  <span class="mini">Save auto • <span class="kbd">N</span> Age Up</span>
+</header>
+
+<main>
+  <!-- LEFT: STATS -->
+  <section class="card"><div class="c">
+    <h2>Stats</h2>
+    <div id="stats"></div>
+    <div class="hr"></div>
+    <div class="grid" id="skills"></div>
+    <div class="hr"></div>
+    <div class="grid">
+      <div>Gold: <b class="gold" id="gold">0</b>g</div>
+      <div>Reputation: <b id="rep">0</b></div>
+      <div>Class: <b id="klass">Peasant</b></div>
+      <div>Title: <b id="title">—</b></div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button id="btnAge">Age Up</button>
+      <button id="btnReset" class="mini" title="Wipe save">Hard Reset</button>
+    </div>
+  </div></section>
+
+  <!-- CENTER: EVENTS & ACTIVITIES -->
+  <section class="card"><div class="c">
+    <h2>Yearly Events</h2>
+    <div id="eventText" class="notice">Press <span class="kbd">Age Up</span> to live another year.</div>
+    <div class="choices" id="choices"></div>
+    <div class="hr"></div>
+    <h2>Activities</h2>
+    <div class="row" style="gap:6px;flex-wrap:wrap">
+      <button id="actStudy">Study</button>
+      <button id="actTrain">Train</button>
+      <button id="actWork">Work</button>
+      <button id="actPray">Pray</button>
+      <button id="actFlirt">Flirt</button>
+      <button id="actCrime">Crime</button>
+    </div>
+    <div id="activityPanel" class="c" style="padding:8px 0 0 0"></div>
+    <div class="hr"></div>
+    <h2>Journal</h2>
+    <div id="log" class="log"></div>
+  </div></section>
+
+  <!-- RIGHT: RELATIONSHIPS & TRAITS -->
+  <section class="card"><div class="c">
+    <h2>Relationships</h2>
+    <div id="rels" class="list"></div>
+    <div class="hr"></div>
+    <h2>Traits & Status</h2>
+    <div id="traits"></div>
+    <div class="hr"></div>
+    <h2>Career</h2>
+    <div id="careerBox" class="mini">Unemployed</div>
+  </div></section>
+</main>
+
+<!-- ======================== CORE ENGINE ========================== -->
+<script>
+const UI = s => document.querySelector(s);
+const UAll = s => Array.from(document.querySelectorAll(s));
+const R = (a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const chance = p => Math.random()<p;
+const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+const SAVE='ml-bitlike-v1';
+
+const NAMES_M = ["Thomas","John","William","Hugh","Robert","Geoffrey","Peter","Walter","Richard","Alan","Adam"];
+const NAMES_F = ["Matilda","Alice","Eleanor","Isabel","Joan","Agnes","Margery","Cecily","Emma","Beatrice","Edith"];
+const SURNAMES = ["of Ashford","the Miller","of York","the Smith","of Dunwich","the Baker","of Kent","of Wye","the Tanner","of Fens"];
+
+function pick(arr){ return arr[R(0,arr.length-1)]; }
+
+// ------------ STATE ------------
+const G = {
+  name:"", sex:"M",
+  age:0, year:1200, alive:true,
+  gold:0, rep:0, title:"",
+  klass:"Peasant",
+  stats:{ health:60, happiness:60, piety:30, smarts:40, charisma:40 },
+  skills:{ combat:0, trade:0, literacy:0 },
+  traits:new Set(),
+  rels:[],   // {id,name,relation,age,closeness,alive}
+  career:null, // {id,name,tier,maxTier,wage,track:'commoner'|'militia'|'clergy'}
+  _pendingEvent:null
+};
+
+// ------------ LOGGING ------------
+function log(t, cls){
+  const el=UI('#log'); const time=new Date().toLocaleTimeString();
+  el.innerHTML += `<div class="${cls||''}">[${time}] ${t}</div>`;
+  el.scrollTop=el.scrollHeight;
+}
+
+// ------------ RENDER ------------
+function bar(label,val,max=100,id){
+  const pct=clamp(Math.round(val/max*100),0,100);
+  return `<div class="mini">${label} ${val}/${max}</div><div class="bar" aria-label="${label}">
+    <i style="width:${pct}%"></i></div>`;
+}
+function renderTop(){
+  UI('#tagName').textContent = G.name||'Unnamed';
+  UI('#tagAge').textContent = (G.alive?G.age:'† '+G.age)+' yrs';
+  UI('#tagYear').textContent = 'Year '+G.year;
+  UI('#tagClass').textContent = G.klass;
+}
+function renderStats(){
+  const S=G.stats;
+  UI('#stats').innerHTML = [
+    bar('Health',S.health,100,'health'),
+    bar('Happiness',S.happiness,100,'happiness'),
+    bar('Piety',S.piety,100,'piety'),
+    bar('Smarts',S.smarts,100,'smarts'),
+    bar('Charisma',S.charisma,100,'charisma')
+  ].join('');
+  UI('#skills').innerHTML = Object.entries(G.skills).map(([k,v])=>`<div>${k}: <b>${v}</b></div>`).join('');
+  UI('#gold').textContent = G.gold;
+  UI('#rep').textContent = G.rep;
+  UI('#klass').textContent = G.klass;
+  UI('#title').textContent = G.title || '—';
+  renderTraits(); renderRels(); renderCareer();
+}
+function renderRels(){
+  const box=UI('#rels'); box.innerHTML='';
+  if(!G.rels.length){ box.innerHTML='<div class="mini">No known relations.</div>'; return; }
+  G.rels.forEach(r=>{
+    const left = `${r.name} <span class="mini">(${r.relation}${r.alive?'':', †'})</span>`;
+    const right = `<div class="bar" style="width:140px"><i style="width:${clamp(r.closeness,0,100)}%"></i></div>`;
+    box.innerHTML += `<div>${left}</div><div>${right}</div>`;
+  });
+}
+function renderTraits(){
+  const t=UI('#traits'); const arr=[...G.traits];
+  if(!arr.length){ t.innerHTML='<span class="pill mini">no traits</span>'; return; }
+  t.innerHTML = arr.map(x=>`<span class="pill">${x}</span>`).join('');
+}
+function renderCareer(){
+  const box=UI('#careerBox');
+  if(!G.career){ box.innerHTML='Unemployed'; return; }
+  const c=G.career;
+  box.innerHTML = `<b>${c.name}</b> · Tier ${c.tier}/${c.maxTier} · Wage ${c.wage}g/yr · <span class="mini">${c.track}</span>`;
+}
+function renderAll(){ renderTop(); renderStats(); }
+
+// ------------ SAVE/LOAD ------------
+function save(){
+  try{ localStorage.setItem(SAVE, JSON.stringify({...G, traits:[...G.traits]})); }catch(e){}
+}
+function load(){
+  try{
+    const raw=localStorage.getItem(SAVE);
+    if(!raw) return false;
+    const d=JSON.parse(raw);
+    Object.assign(G,d);
+    if(Array.isArray(d.traits)) G.traits=new Set(d.traits);
+    return true;
+  }catch(e){ try{localStorage.removeItem(SAVE);}catch(_){}; return false; }
+}
+
+// ------------ INIT / NEW GAME ------------
+function newName(sex){
+  const first = sex==='F'?pick(NAMES_F):pick(NAMES_M);
+  return `${first} ${pick(SURNAMES)}`;
+}
+function newFamily(){
+  const mom={id:'mom',name:newName('F'),relation:'mother',age:R(18,26)+G.age,closeness:R(40,85),alive:true};
+  const dad={id:'dad',name:newName('M'),relation:'father',age:R(18,28)+G.age,closeness:R(35,80),alive:true};
+  const sib={id:'sib',name:Math.random()<0.5?newName('M'):newName('F'),relation:'sibling',age:G.age+R(-5,5),closeness:R(20,70),alive:true};
+  if(sib.age<0) sib.age=0;
+  G.rels=[mom,dad,sib];
+}
+function newGame(){
+  const sex = Math.random()<0.5?'M':'F';
+  G.sex=sex; G.name=newName(sex);
+  G.age=0; G.year=1200; G.alive=true; G.gold=R(0,10); G.rep=0; G.title="";
+  G.klass = chance(0.15) ? 'Freeholder' : 'Peasant';
+  G.stats={ health:R(50,80), happiness:R(45,75), piety:R(20,60), smarts:R(25,70), charisma:R(25,70) };
+  G.skills={ combat:0, trade:0, literacy: G.klass==='Freeholder'?1:0 };
+  G.traits = new Set();
+  newFamily();
+  G.career=null;
+  log(`You are born as ${G.name}, a ${G.klass.toLowerCase()}.`);
+  renderAll(); save();
+}
+
+// ------------ MUTATORS / HELPERS ------------
+function addGold(n){ G.gold=Math.max(0,G.gold+n); renderStats(); }
+function addRep(n){ G.rep=clamp(G.rep+n,-20,100); renderStats(); }
+function addTrait(t){ if(!G.traits.has(t)){ G.traits.add(t); renderTraits(); } }
+function addStat(k,n){ G.stats[k]=clamp(G.stats[k]+n,0,100); renderStats(); }
+function addSkill(k,n){ G.skills[k]=Math.max(0,(G.skills[k]||0)+n); renderStats(); }
+function aliveCheck(){
+  if(G.stats.health<=0){ death("You succumb to your injuries."); return false; }
+  return true;
+}
+function death(reason){
+  G.alive=false;
+  log('☠ '+reason,'danger');
+  UI('#eventText').innerHTML = `<b class="danger">You died at age ${G.age}.</b> ${reason} <br><br><button onclick="location.reload()">Start New Life</button>`;
+  UI('#choices').innerHTML='';
+  renderTop(); save();
+}
+
+// ------------ CAREERS ------------
+const Careers = {
+  commoner: [
+    {name:'Field Hand', tier:1, maxTier:3, wage:6},
+    {name:'Miller’s Helper', tier:2, maxTier:3, wage:10},
+    {name:'Journeyman Artisan', tier:3, maxTier:3, wage:16}
+  ],
+  militia: [
+    {name:'Militia Recruit', tier:1, maxTier:3, wage:8},
+    {name:'Town Guard', tier:2, maxTier:3, wage:14},
+    {name:'Man-at-Arms', tier:3, maxTier:3, wage:22}
+  ],
+  clergy: [
+    {name:'Novice', tier:1, maxTier:3, wage:5},
+    {name:'Monk', tier:2, maxTier:3, wage:9},
+    {name:'Prior’s Scribe', tier:3, maxTier:3, wage:15}
+  ]
+};
+function joinCareer(track){
+  const c = Careers[track][0];
+  G.career={ id:track, name:c.name, tier:c.tier, maxTier:c.maxTier, wage:c.wage, track };
+  log(`You start as ${c.name}.`);
+  renderCareer(); save();
+}
+function careerAnnual(){
+  if(!G.career) return;
+  const c=G.career;
+  addGold(c.wage);
+  log(`Your ${c.name} wages pay ${c.wage}g.`);
+  // promotion chance shaped by skill + rep
+  const skillBoost = c.track==='militia'?G.skills.combat : c.track==='clergy'?G.skills.literacy : G.skills.trade;
+  const chanceProm = 0.08 + Math.min(0.25, skillBoost*0.01 + G.rep*0.002);
+  if(c.tier < c.maxTier && chance(chanceProm)){
+    c.tier++; const def = Careers[c.track][c.tier-1];
+    c.name = def.name; c.wage = def.wage;
+    log(`Promoted to ${c.name}!`, 'good');
+  }
+  renderCareer();
+}
+
+// ------------ EVENT ENGINE ------------
+const EventPacks = []; // each: {name, events:[{id,cond(G),weight,make(G)->{text,choices:[{label,apply(G)}]} }]}
+function registerEventPack(pack){
+  if(EventPacks.some(p=>p.name===pack.name)) return; // idempotent
+  EventPacks.push(pack);
+}
+function pickEvent(){
+  const pool=[];
+  for(const pack of EventPacks){
+    for(const ev of pack.events){
+      try{
+        if(!ev.cond || ev.cond(G)){
+          const w = ev.weight?ev.weight(G):1;
+          if(w>0) pool.push({ev,w});
+        }
+      }catch(_e){}
+    }
+  }
+  if(!pool.length) return null;
+  const sum = pool.reduce((a,b)=>a+b.w,0);
+  let r = Math.random()*sum;
+  for(const {ev,w} of pool){ if((r-=w)<=0) return ev; }
+  return pool[0].ev;
+}
+function showEvent(ev){
+  if(!ev){ UI('#eventText').innerHTML='A quiet year passes.'; UI('#choices').innerHTML=''; return; }
+  const built = ev.make(G);
+  G._pendingEvent = ev.id;
+  UI('#eventText').innerHTML = built.text;
+  const cbox=UI('#choices'); cbox.innerHTML='';
+  built.choices.forEach(choice=>{
+    const btn=document.createElement('button');
+    btn.textContent=choice.label;
+    btn.onclick=()=>{
+      try{ choice.apply(G); }catch(e){ console.warn(e); }
+      renderAll(); save();
+      if(aliveCheck()) { UI('#choices').innerHTML=''; }
+    };
+    cbox.appendChild(btn);
+  });
+}
+// ---- CLASS & TITLE PROGRESSION ----
+const ClassTiers = [
+  { rep: -10, power: 0, klass: 'Outlaw', title: 'None' },
+  { rep: 0, power: 0, klass: 'Peasant', title: '—' },
+  { rep: 20, power: 0, klass: 'Freeholder', title: 'Yeoman' },
+  { rep: 40, power: 15, klass: 'Landed Gentry', title: 'Esquire' },
+  { rep: 60, power: 30, klass: 'Noble', title: 'Knight' },
+  { rep: 80, power: 50, klass: 'High Noble', title: 'Baron' },
+  { rep: 95, power: 80, klass: 'Lord Paramount', title: 'Duke' }
+];
+
+// Checks army size + rep to promote player
+function checkClassPromotion() {
+  const armyPower = G.army?.troops
+    ? Object.values(G.army.troops).reduce((a, b) => a + b, 0)
+    : 0;
+
+  // Find the highest class the player qualifies for
+  let best = ClassTiers[0];
+  for (const tier of ClassTiers) {
+    if (G.rep >= tier.rep && armyPower >= tier.power) {
+      best = tier;
+    }
+  }
+
+  // Promote if different
+  if (G.klass !== best.klass || G.title !== best.title) {
+    G.klass = best.klass;
+    G.title = best.title;
+    log(`Your standing rises — you are now a ${best.title} of the ${best.klass} class!`, 'good');
+    renderAll();
+    save();
+  }
+}
+
+// ------------ YEARLY TICK ------------
+function plaguesAndPerils(){
+  // aging hits / random sickness
+  if(G.age>=45 && chance(0.18)){ addStat('health',-R(5,12)); log('A lingering illness weakens you.','danger'); }
+  if(chance(0.05)){ addStat('health',-R(2,8)); log('You fall ill for a time.','danger'); }
+  if(chance(0.03) && G.career?.track==='militia'){ addStat('health',-R(1,12)); log('A training accident leaves bruises.','danger'); }
+}
+function familyAging(){
+  G.rels.forEach(r=>{ if(!r.alive) return;
+    r.age++;
+    // closeness drift
+    r.closeness = clamp(r.closeness + R(-6,6), 0, 100);
+    // mortality
+    if(chance(Math.max(0, (r.age-50)*0.01))){
+      r.alive=false; log(`${r.name} (${r.relation}) has passed away.`,'danger');
+    }
+  });
+}
+function ageUp(){
+  if(!G.alive) return;
+  G.age++; G.year++;
+  addStat('health', -R(0,2)); // tiny decay
+  familyAging();
+  careerAnnual();
+  plaguesAndPerils();
+  renderAll(); save();
+checkClassPromotion();
+
+  if(!aliveCheck()) return;
+
+  // life milestones & automatic paths
+  if(G.age===12 && G.skills.literacy>=1 && !G.career && chance(0.35)) { joinCareer('clergy'); addTrait('Educated'); }
+  if(G.age===14 && !G.career && chance(0.30)) { joinCareer('militia'); }
+  if(G.age===15 && !G.career) { joinCareer('commoner'); }
+
+  const ev = pickEvent();
+  showEvent(ev);
+}
+
+// ------------ ACTIVITIES (PANELS) ------------
+function panel(html){ UI('#activityPanel').innerHTML=html; }
+function actStudy(){
+  panel(`<div class="sectionLabel">Study & Learn</div>
+    <div class="mini">Attempt to read and write at the monastery school.</div>
+    <div style="margin-top:6px">
+      <button id="s1">Study Letters (1g)</button>
+      <button id="s2">Copy Manuscripts (2g)</button>
+    </div>`);
+  UI('#s1').onclick=()=>{ if(G.gold<1) return log('You need 1g to pay the scribe.','danger');
+    addGold(-1); const gain=chance(0.7)?1:0; addSkill('literacy',gain); addStat('smarts',R(1,3)); addStat('happiness',R(0,2));
+    log(gain? 'You learn new letters (+1 literacy).' : 'You struggle with the primer.'); save();
+  };
+  UI('#s2').onclick=()=>{ if(G.gold<2) return log('You need 2g.','danger');
+    addGold(-2); addSkill('literacy',1); addStat('smarts',R(1,4)); addStat('piety',1); log('You copy psalms by candlelight (+1 literacy, +1 piety).'); save();
+  };
+}
+function actTrain(){
+  panel(`<div class="sectionLabel">Training</div>
+    <div class="mini">Hone your body and trade.</div>
+    <div style="margin-top:6px">
+      <button id="t1">Sparring (free)</button>
+      <button id="t2">Market Haggling (1g)</button>
+    </div>`);
+  UI('#t1').onclick=()=>{ addSkill('combat',1); addStat('health',-R(0,2)); log('You spar with wooden swords (+1 combat).'); save(); };
+  UI('#t2').onclick=()=>{ if(G.gold<1) return log('You need 1g.','danger');
+    addGold(-1); addSkill('trade',1); addStat('charisma',1); log('You learn to read a buyer’s eyes (+1 trade).'); save();
+  };
+}
+function actWork(){
+  panel(`<div class="sectionLabel">Work</div><div class="mini">Earn coin for the year.</div>
+    <div style="margin-top:6px">
+      <button id="w1">Odd Jobs (+0.5g)</button>
+      <button id="w2">${G.career?'Overtime ('+Math.max(2,Math.floor(G.career.wage/3))+'g)':'Look for Work'}</button>
+    </div>`);
+UI('#w1').onclick=()=>{ const p=0.5; addGold(p); addStat('happiness',R(-1,2)); addStat('health',-R(0,2)); log(`You toil for ${p}g.`); save(); };
+  UI('#w2').onclick=()=>{ 
+    if(G.career){ const g=Math.max(2,Math.floor(G.career.wage/3)); addGold(g); addStat('health',-R(0,3)); log(`Extra hours earn ${g}g.`); }
+    else { const opts=['commoner','militia','clergy']; joinCareer(pick(opts)); }
+    save();
+  };
+}
+function actPray(){
+  panel(`<div class="sectionLabel">Piety</div><div class="mini">Seek grace or favor.</div>
+    <div style="margin-top:6px">
+      <button id="p1">Attend Mass</button>
+      <button id="p2">Give Alms (1g)</button>
+    </div>`);
+  UI('#p1').onclick=()=>{ addStat('piety',R(1,3)); addStat('happiness',R(0,2)); log('You feel lighter leaving the chapel.'); save(); };
+  UI('#p2').onclick=()=>{ if(G.gold<1) return log('You need 1g.','danger'); addGold(-1); addRep(1); addStat('piety',2); log('The poor bless your name (+rep).'); save(); };
+}
+function actFlirt(){
+  panel(`<div class="sectionLabel">Romance</div><div class="mini">Seek companionship.</div>
+    <div style="margin-top:6px">
+      <button id="f1">Charm at the Fair</button>
+    </div>`);
+  UI('#f1').onclick=()=>{ const score=G.stats.charisma + G.skills.trade*2 + R(0,30);
+    if(score>70){ addStat('happiness',4); addRep(1); log('You capture hearts at the midsummer fair (+happiness, +rep).','good'); }
+    else if(score>45){ addStat('happiness',2); log('Sweet laughter; no betrothals yet.'); }
+    else { addStat('happiness',-2); log('Awkward silences teach humility.','danger'); }
+    save();
+  };
+}
+function actCrime(){
+  panel(`<div class="sectionLabel">Crime</div><div class="mini">Risky coin and consequences.</div>
+    <div style="margin-top:6px">
+      <button id="c1">Pick Pockets</button>
+      <button id="c2">Poach Deer</button>
+    </div>`);
+  UI('#c1').onclick=()=>{ const skill=G.skills.trade + G.stats.charisma/5 + R(0,30);
+    if(skill>55){ const g=R(2,7); addGold(g); addRep(-1); log(`Quick fingers earn ${g}g. Guards grumble (rep -1).`); }
+    else if(chance(0.2)){ addRep(-5); addStat('health',-R(1,6)); log('Caught and beaten (rep -5).','danger'); if(chance(0.05)) death('Hanged for theft.'); }
+    else log('Nothing found.');
+    save();
+  };
+  UI('#c2').onclick=()=>{ const luck=G.skills.combat + R(0,50);
+    if(luck>60){ const g=R(6,14); addGold(g); addRep(-2); log(`Venison sold in whispers for ${g}g (rep -2).`); }
+    else { addStat('health',-R(2,10)); log('Baron’s men loose hounds on you.','danger'); if(chance(0.03)) death('Executed for poaching.'); }
+    save();
+  };
+}
+
+// ------------ WIRING UI ------------
+UI('#btnAge').onclick=ageUp;
+UI('#btnReset').onclick=()=>{ if(confirm('Wipe save?')){ try{localStorage.removeItem(SAVE);}catch(_e){}; location.reload(); } };
+UI('#actStudy').onclick=actStudy;
+UI('#actTrain').onclick=actTrain;
+UI('#actWork').onclick=actWork;
+UI('#actPray').onclick=actPray;
+UI('#actFlirt').onclick=actFlirt;
+UI('#actCrime').onclick=actCrime;
+document.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='n') ageUp(); });
+
+// ------------ BOOT ------------
+(function init(){
+  if(!load()) newGame();
+  renderAll();
+  log('Welcome back to your medieval life.');
+})();
+
+// =================== EXTENSION API ===================
+/*
+  Create your *own* packs in new <script> tags AFTER this one:
+
+  registerEventPack({
+    name:'My Pack',
+    events:[
+      {
+        id:'black-cat',
+        cond:(G)=>G.age>=8,
+        weight:()=>1,
+        make:(G)=>({
+          text:`A black cat crosses your path.`,
+          choices:[
+            {label:'Shun it', apply:()=>{ addStat('piety',1); log('You avoid ill omen.'); }},
+            {label:'Pet it', apply:()=>{ addStat('happiness',2); log('It purrs. Fortune smiles.'); }}
+          ]
+        })
+      }
+    ]
+  });
+
+  You can also script new Activities by writing functions like actStudy() and binding to a button.
+  Careers: use joinCareer('commoner'|'militia'|'clergy') anywhere appropriate.
+*/
+
+// =================== SAMPLE EVENT PACK (safe to delete) ===================
+registerEventPack({
+  name:'Starter Pack',
+  events:[
+    {
+      id:'childhood-gift',
+      cond:(G)=>G.age>=3 && G.age<=8 && chance(0.4),
+      weight:()=>1,
+      make:()=>({
+        text:`Your ${chance(0.5)?'mother':'father'} gifts you a small wooden toy.`,
+        choices:[
+          {label:'Thank them warmly', apply:()=>{ addStat('happiness',3); addRep(1); }},
+          {label:'Take it apart', apply:()=>{ addStat('smarts',2); }}
+        ]
+      })
+    },
+    {
+      id:'plow-breaks',
+      cond:(G)=>G.age>=9 && G.klass==='Peasant',
+      weight:(G)=> 0.7 + (G.stats.smarts>55?0.5:0),
+      make:()=>({
+        text:`The village plow breaks before harvest.`,
+        choices:[
+          {label:'Help mend it', apply:()=>{ addRep(2); addStat('happiness',1); addSkill('trade',1); log('Your hands learn the weight of iron.'); }},
+          {label:'Do nothing', apply:()=>{ addRep(-1); }}
+        ]
+      })
+    },
+    {
+      id:'barons-levy',
+      cond:(G)=>G.age>=14 && G.career?.track!=='militia' && chance(0.18),
+      weight:()=>1,
+      make:()=>({
+        text:`The baron levies men for a border skirmish.`,
+        choices:[
+          {label:'Volunteer', apply:()=>{ joinCareer('militia'); addTrait('Brave'); addRep(2); addStat('health',-R(0,2)); }},
+          {label:'Hide in the fields', apply:()=>{ addRep(-2); addStat('happiness',-1); }}
+        ]
+      })
+    },
+    {
+      id:'monastery-lessons',
+      cond:(G)=>G.age>=10 && G.skills.literacy<3 && chance(0.25),
+      weight:()=>1,
+      make:()=>({
+        text:`A kindly monk offers lessons.`,
+        choices:[
+          {label:'Accept (1g)', apply:()=>{ if(G.gold<1){ log('You cannot pay.','danger'); return; } addGold(-1); addSkill('literacy',1); addStat('smarts',2); addStat('piety',1); }},
+          {label:'Decline', apply:()=>{ addStat('happiness',-1); }}
+        ]
+      })
+    },
+    {
+      id:'fatal-fever',
+      cond:(G)=>G.age>=30 && chance(0.02),
+      weight:()=>1,
+      make:()=>({
+        text:`A fever takes hold of you.`,
+        choices:[
+          {label:'Endure', apply:()=>{ if(chance(0.4)) death('A fever carries you away.'); else { addStat('health',-R(5,15)); log('You survive, but are weakened.'); } }},
+          {label:'Seek herbs (2g)', apply:()=>{ if(G.gold<2){ log('You cannot afford the herbs.','danger'); return; } addGold(-2); addStat('health',R(1,8)); }}
+        ]
+      })
+    }
+  ]
+});
+// ================= Medieval Life — Army & More Activities Extension =================
+// Drop this <script> AFTER the base "Bitlike Starter" script. Safe to include once.
+// Features:
+// - New Activities: Hunt, Gamble, Craft/Apprentice, Heal, Festival
+// - Army system: recruit, drill, supply, raid/defend/campaign, upkeep & morale
+// - Header tag + Career box summary of army (via safe render wrappers)
+// - Yearly (Age Up) upkeep + desertion if unpaid
+// - Event pack: wars, levies, mercenary offers
+// ================================================================================
+
+(function(){
+  if (window.MilitarumExt) return; // idempotent
+  window.MilitarumExt = true;
+
+  // ----------- State bootstrap -----------
+  const ArmyDefault = {
+    troops:{ militia:0, archers:0, cavalry:0 },
+    morale:50,       // 0..100
+    training:0,      // integer
+    supply:0,        // abstract "supply crates"
+    renown:0,        // military reputation
+    banner:'None'
+  };
+  if (!G.army) G.army = JSON.parse(JSON.stringify(ArmyDefault));
+
+  // Costs / balance
+const RecruitCost = { militia:100, archers:200, cavalry:700 };
+const Upkeep = { militia:15, archers:30, cavalry:100 };  // gold per year
+  const SupplyValue = 3;                                // each supply offsets this many gold upkeep
+  const DrillCost = 1;                                  // gold per drill
+  const SupplyCost = 2;                                 // gold per supply
+
+  // ----------- Small helpers -----------
+  function armySize(){ const t=G.army.troops; return t.militia+t.archers+t.cavalry; }
+  function armyPower(){
+    const t=G.army.troops;
+    const base = t.militia*1 + t.archers*1.6 + t.cavalry*3;
+    const trainMul = 1 + Math.min(0.5, G.army.training*0.05);
+    const moraleMul = 0.8 + G.army.morale/100;
+    return Math.floor(base * trainMul * moraleMul);
+  }
+  function modMorale(n){ G.army.morale = clamp(G.army.morale + n, 0, 100); }
+  function casualties(scale=1){
+    // returns {m,a,c} removed
+    const t=G.army.troops;
+    const lose = (x,f)=>{ const d=Math.min(x, Math.floor(f*scale)); return d; };
+    const m=lose(t.militia, R(0,2));
+    const a=lose(t.archers, R(0,2));
+    const c=lose(t.cavalry, R(0,1));
+    t.militia-=m; t.archers-=a; t.cavalry-=c;
+    return {m,a,c};
+  }
+  function fmtCas(c){ const parts=[]; if(c.m) parts.push(`${c.m} militia`); if(c.a) parts.push(`${c.a} archers`); if(c.c) parts.push(`${c.c} cavalry`); return parts.join(', ')||'no one'; }
+
+  // ----------- UI wiring helpers -----------
+  function ensureActivityButton(id, label, onClick){
+    if (document.getElementById(id)) return;
+    const row = document.querySelector('button#actCrime')?.parentElement;
+    if (!row) return;
+    const b=document.createElement('button'); b.id=id; b.textContent=label; b.onclick=onClick;
+    row.appendChild(b);
+  }
+  function panel(html){ const el=document.querySelector('#activityPanel'); if(el) el.innerHTML=html; }
+
+  // ----------- Army Panel -----------
+  function renderArmyPanel(){
+    const A=G.army, T=A.troops, power=armyPower();
+    panel(`
+      <div class="sectionLabel">Your Banner</div>
+      <div class="mini">Banner: <b>${A.banner}</b> · Renown: <b>${A.renown}</b> · Training: <b>${A.training}</b> · Morale: <b>${A.morale}</b></div>
+      <div class="mini">Troops — Militia: <b>${T.militia}</b>, Archers: <b>${T.archers}</b>, Cavalry: <b>${T.cavalry}</b> · Power: <b>${power}</b></div>
+      <div class="hr"></div>
+      <div class="sectionLabel">Recruit & Logistics</div>
+      <div class="mini">Recruit costs (g): militia ${RecruitCost.militia}, archers ${RecruitCost.archers}, cavalry ${RecruitCost.cavalry}.</div>
+      <div style="margin-top:6px">
+        <button id="re_m">+1 Militia</button>
+        <button id="re_a">+1 Archer</button>
+        <button id="re_c">+1 Cavalry</button>
+        <button id="drill">Drill (${DrillCost}g)</button>
+        <button id="supply">Procure Supply (${SupplyCost}g)</button>
+      </div>
+      <div class="mini" style="margin-top:6px">Supply: <b>${A.supply}</b> · Each supply offsets <b>${SupplyValue}g</b> of yearly upkeep.</div>
+      <div class="hr"></div>
+      <div class="sectionLabel">Operations</div>
+      <div style="margin-top:6px">
+        <button id="raid">Raid Bandits</button>
+        <button id="defend">Defend the Village</button>
+        <button id="campaign">Campaign for the Lord</button>
+      </div>
+      <div class="mini" style="margin-top:6px">Risks: casualties possible; success yields gold/rep/renown.</div>
+    `);
+    // Handlers
+    const buy = (type)=>{
+      const cost=RecruitCost[type]; if(G.gold<cost){ log('Not enough gold to recruit.','danger'); return; }
+      addGold(-cost); G.army.troops[type]++; modMorale(1); log(`You recruit 1 ${type}.`);
+      renderArmyPanel(); save();
+    };
+    document.getElementById('re_m').onclick=()=>buy('militia');
+    document.getElementById('re_a').onclick=()=>buy('archers');
+    document.getElementById('re_c').onclick=()=>buy('cavalry');
+    document.getElementById('drill').onclick=()=>{
+      if(G.gold<DrillCost){ log('You need more gold to drill.','danger'); return; }
+      addGold(-DrillCost); G.army.training++; modMorale(R(1,3)); addSkill('combat',1);
+      log('Your troops drill with discipline (+training, +morale, +combat).','good'); renderArmyPanel(); save();
+    };
+    document.getElementById('supply').onclick=()=>{
+      if(G.gold<SupplyCost){ log('Not enough gold.','danger'); return; }
+      addGold(-SupplyCost); G.army.supply++; addSkill('trade',1); log('You procure rations and fodder (+supply, +trade).');
+      renderArmyPanel(); save();
+    };
+    document.getElementById('raid').onclick=()=>{
+      const p=armyPower(); if(p<6){ log('You need at least a handful of troops before raiding.','danger'); return; }
+      const diff = R(4, 10);
+      if (p >= diff*4){ const g=R(8,18); addGold(g); modMorale(2); G.army.renown++; log(`Raid succeeds. Plunder ${g}g. (+renown)`, 'good'); if(Math.random()<0.35){ const c=casualties(0.4); log(`Minor losses: ${fmtCas(c)}.`); }
+      } else if (p >= diff*2){ const g=R(3,10); addGold(g); modMorale(-1); const c=casualties(0.8); log(`Pyrrhic win. You seize ${g}g but lose ${fmtCas(c)}.`); }
+      else { modMorale(-5); const c=casualties(1.2); addStat('health',-R(1,6)); log(`Raid fails! You lose ${fmtCas(c)}.`, 'danger'); }
+      renderArmyPanel(); save();
+    };
+    document.getElementById('defend').onclick=()=>{
+      const p=armyPower(); const threat=R(5,12);
+      if(p + G.rep/2 >= threat*3){ addRep(2); modMorale(3); G.army.renown+=2; log('You drive off raiders. Villagers cheer (+rep, +renown).','good'); }
+      else { const c=casualties(1.0); addRep(1); modMorale(-2); log(`You hold, but with losses (${fmtCas(c)}). (+rep)`,`good`); }
+      renderArmyPanel(); save();
+    };
+    document.getElementById('campaign').onclick=()=>{
+      if (G.age<16){ log('Too young to lead a campaign.','danger'); return; }
+      const p=armyPower(); const enemy=R(8,16)+Math.floor(G.year%7);
+      const payBase = Math.floor(p/3)+R(5,15);
+      if (p >= enemy*3){ addGold(payBase+10); addRep(2); G.army.renown+=3; modMorale(4); log('Campaign triumph! The lord rewards you handsomely.','good'); if(Math.random()<0.25) addTrait('Veteran');
+      } else if (p >= enemy*2){ addGold(payBase); addRep(1); G.army.renown+=2; const c=casualties(0.7); log(`Hard-fought victory. Reward ${payBase}g; losses: ${fmtCas(c)}.`); }
+      else { const c=casualties(1.5); modMorale(-6); addStat('health',-R(2,10)); log(`Campaign setback. Losses: ${fmtCas(c)}.`, 'danger'); if(Math.random()<0.04) death('Felled in battle.'); }
+      renderArmyPanel(); save();
+    };
+  }
+
+  // ----------- More Activities -----------
+  function actHunt(){
+    panel(`<div class="sectionLabel">Hunt</div>
+      <div class="mini">Stalk game in nearby woods. Risk injuries or fines.</div>
+      <div style="margin-top:6px">
+        <button id="h1">Snare Rabbits</button>
+        <button id="h2">Boar Hunt</button>
+      </div>`);
+    document.getElementById('h1').onclick=()=>{
+      const skill = G.skills.combat + R(0,40);
+      if (skill>45){ const g=R(2,6); addGold(g); addStat('health',-R(0,2)); log(`Game sold for ${g}g.`); }
+      else { addStat('health',-R(1,5)); log('You return empty-handed.'); }
+      save();
+    };
+    document.getElementById('h2').onclick=()=>{
+      const s = G.skills.combat + R(0,55);
+      if (s>65){ const g=R(8,16); addGold(g); addRep(1); log(`A mighty tusker! The village feasts (+${g}g, +rep).`,'good'); }
+      else { addStat('health',-R(3,12)); if (Math.random()<0.05) death('Gored by a boar.'); else log('Boar wounds you.','danger'); }
+      save();
+    };
+  }
+  function actGamble(){
+    panel(`<div class="sectionLabel">Gamble</div>
+      <div class="mini">Cards and bones at the alehouse.</div>
+      <div style="margin-top:6px">
+        <button id="g1">Wager 1g</button>
+        <button id="g2">Wager 5g</button>
+      </div>`);
+    const play=(stake)=>{
+      if (G.gold<stake){ log('Not enough gold.','danger'); return; }
+      addGold(-stake);
+      const edge = (G.stats.charisma-50)/200 + (G.skills.trade*0.01);
+      const win = Math.random() < (0.45+edge);
+      if (win){ const w=stake*2; addGold(w); addStat('happiness',2); log(`You win ${w}g!`,'good'); }
+      else { addStat('happiness',-1); log('Luck deserts you.'); if(Math.random()<0.08) addRep(-1); }
+      save();
+    };
+    document.getElementById('g1').onclick=()=>play(1);
+    document.getElementById('g2').onclick=()=>play(5);
+  }
+  function actCraft(){
+    panel(`<div class="sectionLabel">Apprenticeship & Craft</div>
+      <div class="mini">Learn a trade; make and sell simple goods.</div>
+      <div style="margin-top:6px">
+        <button id="c1">Apprentice Day (1g)</button>
+        <button id="c2">Make Trinkets (2g → ?)</button>
+      </div>`);
+    document.getElementById('c1').onclick=()=>{
+      if(G.gold<1) return log('You need 1g.','danger');
+      addGold(-1); addSkill('trade',1); addStat('smarts',1); log('You file brass and turn a lathe (+trade).');
+      save();
+    };
+    document.getElementById('c2').onclick=()=>{
+      if(G.gold<2) return log('You need 2g for materials.','danger');
+      addGold(-2);
+      const quality = G.skills.trade + G.stats.smarts/2 + R(0,50);
+      if (quality>70){ const g=R(6,12); addGold(g); addRep(1); log(`Your work shines; sold for ${g}g (+rep).`,'good'); }
+      else if (quality>45){ const g=R(3,7); addGold(g); log(`You sell a few for ${g}g.`); }
+      else { log('The trinkets fail to find buyers.'); addStat('happiness',-1); }
+      save();
+    };
+  }
+  function actHeal(){
+    panel(`<div class="sectionLabel">Healing</div>
+      <div class="mini">Rest and remedies.</div>
+      <div style="margin-top:6px">
+        <button id="he1">Rest Day</button>
+        <button id="he2">Herbalist (2g)</button>
+        <button id="he3">Pilgrimage (5g)</button>
+      </div>`);
+    document.getElementById('he1').onclick=()=>{ addStat('health',R(2,5)); addStat('happiness',1); log('You take a day to mend.'); save(); };
+    document.getElementById('he2').onclick=()=>{ if(G.gold<2) return log('You need 2g.','danger'); addGold(-2); addStat('health',R(3,9)); log('Bitter tea, better bones.'); save(); };
+    document.getElementById('he3').onclick=()=>{ if(G.gold<5) return log('You need 5g.','danger'); addGold(-5); addStat('piety',3); addStat('health',R(2,6)); log('Road dust and renewal (+piety).'); save(); };
+  }
+  function actFestival(){
+    panel(`<div class="sectionLabel">Festival</div>
+      <div class="mini">Midsummer fairs, contests, and songs.</div>
+      <div style="margin-top:6px">
+        <button id="f1">Archery Contest (1g)</button>
+        <button id="f2">Dance & Song (free)</button>
+      </div>`);
+    document.getElementById('f1').onclick=()=>{ if(G.gold<1) return log('You need 1g.','danger');
+      addGold(-1);
+      const score = G.skills.combat + R(0,60);
+      if(score>70){ addGold(8); addRep(1); addStat('happiness',3); log('Bullseye! You win the purse (+8g, +rep).','good'); }
+      else if(score>45){ addGold(3); addStat('happiness',2); log('A respectable showing (+3g).'); }
+      else { addStat('happiness',-1); log('Arrows stray; the crowd chuckles.'); }
+      save();
+    };
+    document.getElementById('f2').onclick=()=>{ addStat('happiness',R(2,5)); if(Math.random()<0.2) addTrait('Bon Vivant'); log('You whirl beneath garlands.'); save(); };
+  }
+
+  // Add buttons to the Activities row
+  ensureActivityButton('actArmy','Army', renderArmyPanel);
+  ensureActivityButton('actHunt','Hunt', actHunt);
+  ensureActivityButton('actGamble','Gamble', actGamble);
+  ensureActivityButton('actCraft','Craft', actCraft);
+  ensureActivityButton('actHeal','Heal', actHeal);
+  ensureActivityButton('actFestival','Festival', actFestival);
+
+  // Keyboard shortcut
+  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='a') renderArmyPanel(); });
+
+  // ----------- Yearly upkeep hook -----------
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    // Before event selection, settle upkeep
+    const A=G.army, T=A.troops;
+    const need = T.militia*Upkeep.militia + T.archers*Upkeep.archers + T.cavalry*Upkeep.cavalry;
+    let due = Math.max(0, need - A.supply*SupplyValue);
+    if (A.supply>0) { const used = Math.min(A.supply, Math.ceil(need/SupplyValue)); A.supply -= used; }
+    if (due>0){
+      if (G.gold >= due){ addGold(-due); modMorale(1); log(`Army upkeep paid: ${due}g.`); }
+      else{
+        const short = due - G.gold;
+        addGold(-G.gold); // zero the purse
+        modMorale(-Math.min(10, 2+Math.floor(short)));
+        log(`You could not cover upkeep (short ${short}g). Morale falls; some desert.`, 'danger');
+        // Desertion proportional to shortfall
+        const deserters = casualties(0.5 + short*0.2);
+        log(`Desertion: ${fmtCas(deserters)}.`, 'danger');
+      }
+    } else {
+      modMorale(2);
+      log('Your supplies cover upkeep (+morale).');
+    }
+    // Natural morale drift
+    modMorale(R(-1,2));
+    _ageUp(); // proceed with original year tick
+  };
+
+  // ----------- Render hooks (header tag + career box detail) -----------
+  // Header tag: show quick army size
+  (function addHeaderTag(){
+    if (document.getElementById('tagArmy')) return;
+    const hdr=document.querySelector('header');
+    if(!hdr) return;
+    const span=document.createElement('span');
+    span.id='tagArmy';
+    span.className='tag';
+    span.textContent = `Army ${armySize()}`;
+    hdr.insertBefore(span, hdr.querySelector('.spacer'));
+    // update on every renderTop
+    const _renderTop = window.renderTop;
+    window.renderTop = function(){
+      _renderTop();
+      span.textContent = `Army ${armySize()}`;
+    };
+  })();
+
+  // Career box augmentation
+  const _renderCareer = window.renderCareer;
+  window.renderCareer = function(){
+    _renderCareer();
+    const box=document.getElementById('careerBox');
+    if(!box) return;
+    const t=G.army.troops;
+    const line=`<div class="mini" id="armyMini">Army — M:${t.militia} A:${t.archers} C:${t.cavalry} · Morale ${G.army.morale} · Power ${armyPower()} · Supply ${G.army.supply}</div>`;
+    if (!document.getElementById('armyMini')) box.insertAdjacentHTML('beforeend', line);
+    else document.getElementById('armyMini').outerHTML = line;
+  };
+
+  // ----------- Event Pack: War & Politics -----------
+  registerEventPack({
+    name:'War & Politics',
+    events:[
+      {
+        id:'levy-call',
+        cond:(G)=>G.age>=14 && armySize()<6 && Math.random()<0.20,
+        weight:()=>1,
+        make:()=>({
+          text:`The local lord calls for levies. He offers a small stipend for each recruit you muster under your banner.`,
+          choices:[
+            {label:'Raise 3 militia (9g)', apply:()=>{ if(G.gold<9){ log('You need 9g.','danger'); return; }
+              addGold(-9); G.army.troops.militia+=3; modMorale(2); log('Three farm lads join with spears.'); }},
+            {label:'Decline', apply:()=>{ addRep(-1); log('The lord notes your reluctance.'); }}
+          ]
+        })
+      },
+      {
+        id:'merc-offer',
+        cond:(G)=>G.age>=16 && armySize()>=4 && Math.random()<0.18,
+        weight:()=>1,
+        make:()=>({
+          text:`A passing mercenary captain offers to train your men for coin.`,
+          choices:[
+            {label:`Pay ${2}g for drills`, apply:()=>{ if(G.gold<2){ log('You need 2g.','danger'); return; }
+              addGold(-2); G.army.training+=1; modMorale(2); addSkill('combat',1); log('Hard lessons hammered in (+training).'); }},
+            {label:'Refuse', apply:()=>{ log('You keep your purse closed.'); }}
+          ]
+        })
+      },
+      {
+        id:'border-fray',
+        cond:(G)=>G.age>=15 && Math.random()<0.14,
+        weight:()=>1,
+        make:()=>({
+          text:`Border frays erupt nearby. Would you intervene for favor?`,
+          choices:[
+            {label:'Send a detachment', apply:()=>{ 
+              if(armySize()<3){ log('You lack the numbers.','danger'); return; }
+              const before=armyPower(); const c=casualties(0.6); const gain=before>12?2:1;
+              addRep(gain); G.army.renown+=gain; modMorale(before>12?2:-1);
+              log(`Detachment returns. Losses: ${fmtCas(c)}. (+rep ${gain}, +renown ${gain})`);
+            }},
+            {label:'Stay out of it', apply:()=>{ addRep(-1); log('Whispers of cowardice spread (-rep).'); }}
+          ]
+        })
+      }
+    ]
+  });
+
+  // First render refresh (so new UI bits show immediately)
+  renderCareer();
+})();
+// ===== Medieval Life — Army Advanced (same Army tab) =====================
+// Adds many new unit types + ops inside the existing Army panel.
+// Works with your previous "Army & More Activities" extension.
+// ========================================================================
+(function(){
+  if (window.ArmyAdvancedSameTab) return; window.ArmyAdvancedSameTab = true;
+
+  // ---------- bootstrap ----------
+  const ADV_KEYS = ['spearmen','pikemen','crossbow','skirmishers','heavy_inf','engineers','medics','light_cav','knights','sappers'];
+  if (!G.army) G.army = {troops:{}, morale:50, training:0, supply:0, renown:0, banner:'None'};
+  G.army.troops = Object.assign({
+    militia:G.army.troops.militia||0, archers:G.army.troops.archers||0, cavalry:G.army.troops.cavalry||0
+  }, ...ADV_KEYS.map(k=>({[k]:G.army.troops[k]||0})));
+  if (typeof G.army.sup2!=='number') G.army.sup2=0; // specialist supplies
+
+  // ---------- balance ----------
+const RecruitCost = { 
+  spearmen:100, pikemen:180, crossbow:200, skirmishers:120, 
+  heavy_inf:240, engineers:280, medics:160, light_cav:240, 
+  knights:560, sappers:220 
+};
+const Upkeep = { 
+  spearmen:8, pikemen:16, crossbow:18, skirmishers:10, 
+  heavy_inf:25, engineers:28, medics:14, light_cav:25, 
+  knights:60, sappers:20 
+};
+  const PowerW     = { spearmen:1.3, pikemen:1.8, crossbow:2.1, skirmishers:1.2, heavy_inf:2.6, engineers:0.6, medics:0.2, light_cav:2.2, knights:4.0, sappers:0.9,
+                       militia:1, archers:1.6, cavalry:3 };
+  const DrillCost=2, SpecSupplyCost=3, SpecSupplyValue=4;
+
+  // ---------- utils ----------
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  function log(t,cls){ const el=document.querySelector('#log'); const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; }
+  function addGold(n){ G.gold=Math.max(0,G.gold+n); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; }
+  function addRep(n){ G.rep=clamp(G.rep+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; }
+  function addStat(k,n){ G.stats[k]=clamp(G.stats[k]+n,0,100); }
+  function save(){ try{ localStorage.setItem('ml-bitlike-v1', JSON.stringify({...G, traits:[...G.traits]})); }catch(_){} }
+
+  function advSize(){ return Object.values(G.army.troops).reduce((a,b)=>a+(b||0),0); }
+  function advPower(){
+    const t=G.army.troops;
+    let base=0; for(const k in PowerW) base+=(t[k]||0)*PowerW[k];
+    const train=1+Math.min(0.5,(G.army.training||0)*0.05);
+    const morale=0.8+(G.army.morale||0)/100;
+    return Math.floor(base*train*morale);
+  }
+  function modMorale(n){ G.army.morale=clamp((G.army.morale||0)+n,0,100); }
+
+  function bonuses(){
+    const T=G.army.troops;
+    return {
+      atk: Math.min(14,(T.knights||0)*1.2)+Math.min(12,(T.crossbow||0)*0.7),
+      def: Math.min(12,(T.heavy_inf||0)*0.9)+Math.min(10,(T.pikemen||0)*0.8),
+      siege: Math.min(15,(T.engineers||0)*1.1)+Math.min(10,(T.sappers||0)*0.9),
+      amb: Math.min(10,(T.skirmishers||0)*0.8),
+      sustain: Math.min(10,(T.medics||0)*1.2)
+    };
+  }
+  function casualties(scale=1){
+    const T=G.army.troops, out={};
+    const kinds=['militia','spearmen','pikemen','archers','crossbow','skirmishers','heavy_inf','light_cav','cavalry','knights','engineers','sappers','medics'];
+    kinds.forEach(k=>{ const d=Math.min(T[k]||0, Math.floor((k.includes('cav')||k==='knights'?R(0,1):R(0,2))*scale)); T[k]=(T[k]||0)-d; out[k]=d; });
+    return out;
+  }
+  const fmtCas=o=>Object.entries(o).filter(([,v])=>v>0).map(([k,v])=>`${v} ${k}`).join(', ')||'no one';
+
+  // ---------- panel augmentation ----------
+  function panelEl(){ return document.querySelector('#activityPanel'); }
+  function appendAdvancedSection(){
+    const panel=panelEl(); if(!panel) return;
+    // prevent duplicate injection
+    const old=panel.querySelector('#advArmySection'); if(old) old.remove();
+
+    const T=G.army.troops, P=advPower(), B=bonuses();
+    const wrap=document.createElement('div'); wrap.id='advArmySection';
+    wrap.innerHTML = `
+      <div class="hr"></div>
+      <div class="sectionLabel">Advanced Forces</div>
+      <div class="mini">Power <b>${P}</b> · Morale <b>${G.army.morale}</b> · Training <b>${G.army.training}</b> · Renown <b>${G.army.renown}</b></div>
+      <div class="mini">Specialist Supply: <b>${G.army.sup2}</b> (covers <b>${SpecSupplyValue}g</b> adv. upkeep each)</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px;margin-top:6px" id="advGrid"></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">
+        <button id="advDrill">Advanced Drill (${DrillCost}g)</button>
+        <button id="advSup">Buy Specialist Supply (${SpecSupplyCost}g)</button>
+        <span class="mini">Comp: Atk +${B.atk} · Def +${B.def} · Siege +${B.siege} · Amb +${B.amb} · Sustain +${B.sustain}</span>
+      </div>
+      <div class="sectionLabel" style="margin-top:8px">Advanced Operations</div>
+      <div style="margin-top:6px">
+        <button id="opAmbush">Ambush Raiders</button>
+        <button id="opEscort">Escort Caravan</button>
+        <button id="opSiege">Siege a Fort</button>
+      </div>
+    `;
+    panel.appendChild(wrap);
+
+    // recruit grid
+    const grid=wrap.querySelector('#advGrid');
+    function card(k,label){ return `
+      <div class="mini" style="border:1px solid #2a3046;border-radius:10px;padding:6px">
+        <div><b>${label}</b> · ${T[k]} in ranks</div>
+        <div>Cost ${RecruitCost[k]}g · Upkeep ${Upkeep[k]}g/yr</div>
+        <button data-k="${k}" style="margin-top:4px">Recruit</button>
+      </div>`; }
+    grid.innerHTML = [
+      card('spearmen','Spearmen'), card('pikemen','Pikemen'), card('crossbow','Crossbowmen'),
+      card('skirmishers','Skirmishers'), card('heavy_inf','Heavy Infantry'), card('light_cav','Light Cavalry'),
+      card('knights','Knights'), card('engineers','Engineers'), card('sappers','Sappers'), card('medics','Field Medics')
+    ].join('');
+
+    grid.addEventListener('click',e=>{
+      const k=e.target?.dataset?.k; if(!k) return;
+      const c=RecruitCost[k]; if(G.gold<c){ log('Not enough gold.','danger'); return; }
+      addGold(-c); T[k]++; if(k==='knights') { addRep(1); G.army.renown++; }
+      log(`You recruit 1 ${k.replace('_',' ')}.`); appendAdvancedSection(); save();
+    });
+
+    wrap.querySelector('#advDrill').onclick=()=>{ if(G.gold<DrillCost){ log('You need more gold.','danger'); return; }
+      addGold(-DrillCost); G.army.training++; modMorale(R(1,3)); log('Rigorous drills (+training, +morale).','good'); appendAdvancedSection(); save(); };
+    wrap.querySelector('#advSup').onclick=()=>{ if(G.gold<SpecSupplyCost){ log('Not enough gold.','danger'); return; }
+      addGold(-SpecSupplyCost); G.army.sup2++; log('You stock specialist supplies.'); appendAdvancedSection(); save(); };
+
+    // ops
+    wrap.querySelector('#opAmbush').onclick=()=>{
+      const base=advPower(), bb=bonuses(), diff=R(8,14), score=base+bb.amb*3+bb.atk;
+      if(score>=diff*5){ addGold(R(10,20)); addRep(1); modMorale(3); log('Perfect ambush! Plunder and cheers.','good'); }
+      else if(score>=diff*3){ addGold(R(5,12)); modMorale(1); const c=casualties(0.6*(1-(bb.sustain/20))); log(`Successful strike; losses: ${fmtCas(c)}.`); }
+      else { modMorale(-4); const c=casualties(1.0*(1-(bb.sustain/25))); addStat('health',-R(1,6)); log(`Ambush backfires. Losses: ${fmtCas(c)}.`,'danger'); }
+      appendAdvancedSection(); save();
+    };
+    wrap.querySelector('#opEscort').onclick=()=>{
+      const base=advPower(), bb=bonuses(), risk=R(10,16), score=base+bb.def*2;
+      if(score>=risk*4){ const g=R(10,18); addGold(g); addRep(2); modMorale(2); log(`Caravan arrives safely (+${g}g, +rep).`,'good'); }
+      else if(score>=risk*2){ const g=R(4,10); addGold(g); const c=casualties(0.7*(1-(bb.sustain/20))); log(`Bandits harry you; reward ${g}g. Losses: ${fmtCas(c)}.`); }
+      else { const c=casualties(1.2*(1-(bb.sustain/18))); modMorale(-3); addRep(-1); log(`Escort fails. Losses: ${fmtCas(c)}. (-rep)`,'danger'); }
+      appendAdvancedSection(); save();
+    };
+    wrap.querySelector('#opSiege').onclick=()=>{
+      const base=advPower(), bb=bonuses(), walls=R(14,22), score=base+bb.siege*4+bb.atk;
+      if(score>=walls*5){ const g=R(20,40); addGold(g); addRep(2); G.army.renown+=3; modMorale(4); log(`Fort surrenders! Rich plunder ${g}g. (+renown)`,'good'); }
+      else if(score>=walls*3){ const g=R(8,20); addGold(g); const c=casualties(1.0*(1-(bb.sustain/15))); log(`Hard siege; reward ${g}g. Losses: ${fmtCas(c)}.`); }
+      else { const c=casualties(1.6*(1-(bb.sustain/12))); modMorale(-6); addStat('health',-R(2,10)); log(`Siege fails; sorties ravage your camp. Losses: ${fmtCas(c)}.`,'danger'); }
+      appendAdvancedSection(); save();
+    };
+  }
+
+  // ---------- hook Army button & shortcut to append section ----------
+  function hookArmyOpen(){
+    const btn=document.getElementById('actArmy');
+    if(!btn) return;
+    if (!btn._advWrapped){
+      const orig = btn.onclick;
+      btn.onclick = ()=>{ orig?.(); setTimeout(appendAdvancedSection, 0); };
+      btn._advWrapped = true;
+    }
+  }
+  // call once now, and again whenever activities row might rerender
+  hookArmyOpen();
+  // also watch keyboard 'A' shortcut from base extension: append after it fires
+  document.addEventListener('keydown', e=>{
+    if(e.key.toLowerCase()==='a' && !e.shiftKey){
+      setTimeout(appendAdvancedSection, 0);
+    }
+  });
+
+  // ---------- yearly advanced upkeep (chains with existing) ----------
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    // compute advanced-only upkeep
+    const T=G.army.troops;
+    let need=0; ADV_KEYS.forEach(k=>{ need += (T[k]||0) * (Upkeep[k]||0); });
+    const covered = Math.min(G.army.sup2, Math.ceil(need/SpecSupplyValue));
+    const due = Math.max(0, need - covered*SpecSupplyValue);
+    if(G.army.sup2>0) G.army.sup2 -= covered;
+
+    if(due>0){
+      if(G.gold>=due){ addGold(-due); modMorale(1); log(`Advanced upkeep paid: ${due}g.`); }
+      else{
+        const short=due-G.gold; addGold(-G.gold); modMorale(-Math.min(10,2+Math.floor(short)));
+        const c=casualties(0.6); log(`Couldn’t cover advanced upkeep (short ${short}g). Desertions: ${fmtCas(c)}.`, 'danger');
+      }
+    } else if(need>0){ modMorale(1); log('Specialist supplies cover advanced upkeep (+morale).'); }
+
+    _ageUp(); // finish normal year processing (includes base army upkeep)
+  };
+
+  // ---------- keep header army count accurate ----------
+  (function patchHeader(){
+    const span=document.getElementById('tagArmy'); if(!span || !window.renderTop) return;
+    const old=window.renderTop;
+    window.renderTop = function(){ old(); span.textContent = `Army ${advSize()}`; };
+    window.renderTop();
+  })();
+
+  // ensure the section appears the next time Army opens
+  setTimeout(hookArmyOpen, 0);
+})();
+// ===== Medieval Life — Army Operations: HARD MODE (same Army tab) ===========
+(function(){
+  if (window.ArmyOpsHardMode) return; window.ArmyOpsHardMode = true;
+
+  // ---- bootstrap / helpers ----
+  if (!G.army) G.army = {troops:{}, morale:50, training:0, supply:0, renown:0, banner:'None'};
+  if (typeof G.army.doctrine!=='string') G.army.doctrine = 'Balanced';
+  if (typeof G.army.intel!=='number') G.army.intel = 0;
+
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const chance=p=>Math.random()<p;
+  function log(t,cls){ const el=document.querySelector('#log'); const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; }
+  function addGold(n){ G.gold=Math.max(0,G.gold+n); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; }
+  function addRep(n){ G.rep=clamp(G.rep+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; }
+  function addStat(k,n){ G.stats[k]=clamp(G.stats[k]+n,0,100); }
+  function save(){ try{ localStorage.setItem('ml-bitlike-v1', JSON.stringify({...G, traits:[...G.traits]})); }catch(_){} }
+  const addTraitSafe=(t)=>{ if(typeof window.addTrait==='function') addTrait(t); };
+
+  // weight map (works with basic + advanced troop packs)
+  const PowerW = {
+    militia:1, archers:1.6, cavalry:3,
+    spearmen:1.3, pikemen:1.8, crossbow:2.1, skirmishers:1.2,
+    heavy_inf:2.6, light_cav:2.2, knights:4.0, engineers:0.6, sappers:0.9, medics:0.2
+  };
+
+  function size(){ return Object.values(G.army.troops||{}).reduce((a,b)=>a+(b||0),0); }
+  function morale(n){ G.army.morale = clamp((G.army.morale||0)+n,0,100); }
+  function power(){
+    const t=G.army.troops||{};
+    let base=0; for(const k in t){ base += (t[k]||0) * (PowerW[k]||1); }
+    const train = 1 + Math.min(0.5,(G.army.training||0)*0.05);
+    const mor   = 0.8 + (G.army.morale||0)/100;
+    return Math.floor(base*train*mor);
+  }
+  function comp(){
+    const T=G.army.troops||{};
+    return {
+      atk: Math.min(16,(T.knights||0)*1.2) + Math.min(14,(T.crossbow||0)*0.7),
+      def: Math.min(14,(T.heavy_inf||0)*0.9) + Math.min(12,(T.pikemen||0)*0.8),
+      siege: Math.min(18,(T.engineers||0)*1.1) + Math.min(12,(T.sappers||0)*0.9),
+      amb: Math.min(12,(T.skirmishers||0)*0.8),
+      sustain: Math.min(12,(T.medics||0)*1.2)
+    };
+  }
+  function casualties(scale=1){
+    const T=G.army.troops||{}; const out={};
+    Object.keys(T).forEach(k=>{
+      const cav = (k.includes('cav')||k==='knights')?R(0,2):R(0,3);
+      const d=Math.min(T[k]||0, Math.floor(cav*scale));
+      T[k]=(T[k]||0)-d; if(d>0) out[k]=d;
+    });
+    return out;
+  }
+  const fmtCas=o=>Object.entries(o).map(([k,v])=>`${v} ${k.replace('_',' ')}`).join(', ')||'no one';
+
+  // ---- UI injection (replaces prior ops section if present) ----
+  function panelEl(){ return document.querySelector('#activityPanel'); }
+
+  function appendHardOps(){
+    const p=panelEl(); if(!p) return;
+    const old=p.querySelector('#armyOpsSection'); if(old) old.remove();
+    const old2=p.querySelector('#armyOpsHard'); if(old2) old2.remove();
+
+    const P=power(), C=comp();
+    const wrap=document.createElement('div'); wrap.id='armyOpsHard';
+    wrap.innerHTML = `
+      <div class="hr"></div>
+      <div class="sectionLabel">Operations & Battles — <span class="danger">Hard Mode</span></div>
+      <div class="mini">Power <b>${P}</b> · Morale <b>${G.army.morale}</b> · Training <b>${G.army.training}</b> · Intel <b>${G.army.intel}</b> · Renown <b>${G.army.renown||0}</b></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">
+        <span class="mini">Doctrine:</span>
+        <button data-doc="Cautious"${G.army.doctrine==='Cautious'?' disabled':''}>Cautious</button>
+        <button data-doc="Balanced"${G.army.doctrine==='Balanced'?' disabled':''}>Balanced</button>
+        <button data-doc="Aggressive"${G.army.doctrine==='Aggressive'?' disabled':''}>Aggressive</button>
+        <span class="mini">Difficulty:</span>
+        <select id="diffSel">
+          <option value="local">Local (hard)</option>
+          <option value="regional">Regional (very hard)</option>
+          <option value="invasion">Invasion (brutal)</option>
+        </select>
+        <button id="btnOdds" class="mini">Simulate Odds</button>
+      </div>
+
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:8px">
+        <button id="opRecon">Recon</button>
+        <button id="opPatrol">Patrol</button>
+        <button id="opRaid">Raid Lines</button>
+        <button id="opAmbush">Ambush Column</button>
+        <button id="opSkirmish">Skirmish</button>
+        <button id="opBattle">Field Battle</button>
+        <button id="opSiege">Siege Assault</button>
+        <button id="opHold">Hold the Line</button>
+      </div>
+      <div class="mini" style="margin-top:6px">
+        Big operations now demand <b>huge</b> power. Rewards scale with enemy strength.
+        Comp: Atk +${C.atk} · Def +${C.def} · Siege +${C.siege} · Amb +${C.amb} · Sustain +${C.sustain}
+      </div>
+    `;
+    p.appendChild(wrap);
+
+    wrap.querySelectorAll('button[data-doc]').forEach(b=>{
+      b.onclick=()=>{ G.army.doctrine=b.dataset.doc; log(`Doctrine set to ${G.army.doctrine}.`); appendHardOps(); save(); };
+    });
+
+    // ENEMY POWER (much higher)
+    function enemyPower(){
+      const sel = wrap.querySelector('#diffSel').value;
+      const y = (G.year%9);
+      const intel = -Math.min(6, G.army.intel*2); // intel helps but less dramatic here
+if (sel==='local')   return R(80, 150) + y + intel;     // harder local ops
+if (sel==='regional')return R(200, 350) + y + intel;    // tough regionals
+return R(500, 1000) + y + intel;       //brutal invasions   
+    }
+
+    function stance(){
+      if(G.army.doctrine==='Cautious') return {success:1.10, loot:0.9, loss:0.7, renown:0.9};
+      if(G.army.doctrine==='Aggressive')return {success:0.90, loot:1.35, loss:1.45, renown:1.3};
+      return {success:1.0, loot:1.0, loss:1.0, renown:1.0};
+    }
+
+    // Core resolver (with very hard thresholds + rich rewards)
+    function resolve({name, baseMod=0, useAtk=0, useDef=0, useAmb=0, useSiege=0, renown=1, rep=0, wound=6, big=false}){
+      const pow = power();
+      const E = enemyPower();
+      const B = comp();
+      const S = stance();
+
+      // Huge thresholds; big ops use even tougher bar
+      const thresholdMul = big ? 5.5 : 4.0;
+      let score = pow + B.atk*useAtk + B.def*useDef + B.amb*useAmb + B.siege*useSiege + baseMod + G.army.intel*2;
+      const successOdds = clamp((score / (E*thresholdMul)) * S.success, 0.08, 0.92);
+      const win = Math.random() < successOdds;
+
+      // Casualties harsher; medics reduce
+      const sustain = 1 - (B.sustain/22);
+      const lossBase = (win ? 0.8 : 1.6) * S.loss * sustain;
+
+      // Rewards scale strongly with enemy power (+ doctrine loot)
+      const goldBase = Math.floor((E * (big? R(3,5) : R(2,3))) * S.loot); // huge multipliers
+      const renownGain = Math.ceil((renown + (big?2:0)) * S.renown);
+      const repGain = rep + (big?1:0);
+
+      if(win){
+        const g = goldBase + R(5,15);
+        addGold(g); if(repGain) addRep(repGain);
+        if(renownGain) G.army.renown = (G.army.renown||0) + renownGain;
+        morale(big?6:3);
+        if(big && chance(0.35)) { G.army.training++; } // victories sharpen steel
+        log(`${name}: <b>Victory!</b> You gain ${g}g${repGain?`, +rep ${repGain}`:''}, +renown ${renownGain}.`,'good');
+
+        // Rare spoils for big wins
+        if(big){
+          if(chance(0.30)){ const bonus = R(20,40); addGold(bonus); log(`War chest captured (+${bonus}g).`,'good'); }
+          if(chance(0.20)){ addTraitSafe('Victor'); log('You earn the epithet “Victor”.'); }
+          if(chance(0.15)){ addTraitSafe('Strategist'); log('Your planning becomes renowned.'); }
+        }
+
+        if(chance(0.45)){ const c=casualties(lossBase); log(`Losses: ${fmtCas(c)}.`); }
+        addStat('health', -R(0,wound));
+      } else {
+        morale(big?-8:-5);
+        const c=casualties(lossBase*1.2);
+        addStat('health', -R(Math.floor(wound/2), wound+2));
+        addRep(Math.min(0, rep-1));
+        log(`${name}: Defeat. Enemy ≈ ${E}. Losses: ${fmtCas(c)}.`, 'danger');
+        // risk of route on big failures
+        if(big && chance(0.12)){ const desert = casualties(0.8); log(`Your line breaks; more desertions: ${fmtCas(desert)}.`, 'danger'); }
+      }
+
+      // Intel decays after any op except Recon
+      if(name!=='Recon') G.army.intel = Math.max(0, G.army.intel - (big?2:1));
+      appendHardOps(); save();
+    }
+
+    // Odds preview
+    wrap.querySelector('#btnOdds').onclick=()=>{
+      const pow=power(), E=enemyPower(), B=comp(), S=stance();
+      const baseScore = pow + B.atk + B.def + G.army.intel*2;
+      const oddsSmall = clamp((baseScore/(E*4.0))*S.success, 0.05, 0.95);
+      const oddsBig   = clamp((baseScore/(E*5.5))*S.success, 0.03, 0.90);
+      log(`Est. chances — Small ops ~${(oddsSmall*100|0)}% · Big ops ~${(oddsBig*100|0)}% vs enemy power ${E}.`);
+    };
+
+    // Ops
+    wrap.querySelector('#opRecon').onclick=()=>{
+      const cost=2; if(G.gold<cost){ log('Recon needs 2g for scouts.','danger'); return; }
+      addGold(-cost);
+      const boost = 1 + (chance(0.45)?1:0) + (chance(0.15)?1:0); // sometimes +2 or +3
+      G.army.intel = clamp(G.army.intel + boost, 0, 7);
+      morale(1); log(`Scouts return. Intel +${boost} (now ${G.army.intel}).`);
+      appendHardOps(); save();
+    };
+    wrap.querySelector('#opPatrol').onclick=()=>resolve({ name:'Patrol', baseMod:6, useDef:2, renown:1, rep:1, wound:5 });
+    wrap.querySelector('#opRaid').onclick=()=>resolve({ name:'Raid', useAtk:2, renown:2, rep:0, wound:7 });
+    wrap.querySelector('#opAmbush').onclick=()=>resolve({ name:'Ambush', useAmb:4, useAtk:1, renown:2, rep:1, wound:7 });
+    wrap.querySelector('#opSkirmish').onclick=()=>resolve({ name:'Skirmish', useAtk:2, useDef:1, renown:2, rep:0, wound:7 });
+    // BIG OPS (very hard thresholds + big rewards)
+    wrap.querySelector('#opBattle').onclick=()=>resolve({ name:'Field Battle', baseMod:3, useAtk:3, useDef:3, renown:3, rep:3, wound:9, big:true });
+    wrap.querySelector('#opSiege').onclick=()=>resolve({ name:'Siege Assault', useSiege:5, useAtk:2, renown:4, rep:3, wound:11, big:true });
+    wrap.querySelector('#opHold').onclick=()=>resolve({ name:'Hold the Line', baseMod:10, useDef:4, renown:3, rep:4, wound:8, big:true });
+  }
+
+  // Hook the existing Army button and the 'A' shortcut so our Hard Mode ops show under it
+  function hookArmyOpen(){
+    const btn=document.getElementById('actArmy');
+    if(!btn) return;
+    if (!btn._hardOpsWrapped){
+      const orig = btn.onclick;
+      btn.onclick = ()=>{ orig?.(); setTimeout(appendHardOps, 0); };
+      btn._hardOpsWrapped = true;
+    }
+  }
+  hookArmyOpen();
+  document.addEventListener('keydown', e=>{
+    if(e.key.toLowerCase()==='a' && !e.shiftKey){ setTimeout(appendHardOps, 0); }
+  });
+
+  // keep header army count accurate if other scripts modify troops
+  (function patchHeader(){
+    const span=document.getElementById('tagArmy'); if(!span || !window.renderTop) return;
+    const old=window.renderTop;
+    window.renderTop = function(){ old(); span.textContent = `Army ${size()}`; };
+  })();
+
+})();
+// ========= EXT: The World — Kingdoms (Bitlike Starter compatible) ==========
+(function(){
+  if (window.WorldKingdomsExt) return; window.WorldKingdomsExt = true;
+
+  // ---------- helpers & glue to base ----------
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const chance=p=>Math.random()<p;
+  function log(t,cls){ const el=document.querySelector('#log'); const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; }
+  function addGold(n){ G.gold=Math.max(0,G.gold+n); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; }
+  function addRep(n){ G.rep=clamp(G.rep+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; }
+  function addStat(k,n){ G.stats[k]=clamp(G.stats[k]+n,0,100); }
+
+  // Read army power from the existing extensions (basic + advanced units)
+  const PowerW = { militia:1, archers:1.6, cavalry:3,
+    spearmen:1.3, pikemen:1.8, crossbow:2.1, skirmishers:1.2,
+    heavy_inf:2.6, light_cav:2.2, knights:4.0, engineers:0.6, sappers:0.9, medics:0.2 };
+  function armyPower(){
+    const A=G.army?.troops||{}; let base=0;
+    for(const k in A){ base += (A[k]||0) * (PowerW[k]||1); }
+    const train = 1 + Math.min(0.5,(G.army?.training||0)*0.05);
+    const mor   = 0.8 + (G.army?.morale||0)/100;
+    return Math.floor(base*train*mor);
+  }
+
+  // ---------- data & storage ----------
+  const SAVE='ml-world-kingdoms-v2';
+  let K=[]; // kingdoms
+  const KNAMES = ["Aldervale","Bramwick","Caerthorne","Dunhollow","Eldhame","Frostmarch","Grimscar","Highwall","Ironvale","Kingsreach","Lornmere","Mistmoor","Northwatch","Oakspire","Pyrestone","Queensport","Ravenkeep","Stormfort","Thrymburg","Umberhold","Valewood","Wyrmgate"];
+  const FLAGS  = ["🏰","🦁","🛡️","⚔️","🐉","🦅","🐺","🦌","🐗","🦬","🏇","🗡️","🔥","❄️"];
+
+  function makeKingdom(){
+    return {
+      id: `${Date.now()}_${Math.random().toString(36).slice(2)}`,
+      name: KNAMES[R(0,KNAMES.length-1)],
+      flag: FLAGS[R(0,FLAGS.length-1)],
+      power: R(1000,10000),
+      gold: R(200,1200),
+      relation: ["Friendly","Neutral","Hostile"][R(0,2)],
+      personality: ["Aggressive","Defensive","Neutral"][R(0,2)],
+      intel: 0,    // your intel on them 0..5
+      allied: false
+    };
+  }
+  function initWorld(){ K=[]; const n=R(4,8); for(let i=0;i<n;i++) K.push(makeKingdom()); saveWorld(); }
+  function saveWorld(){ try{ localStorage.setItem(SAVE, JSON.stringify(K)); }catch(_){} }
+  function loadWorld(){ try{ const raw=localStorage.getItem(SAVE); if(!raw) return false; K=JSON.parse(raw)||[]; return K.length>0; }catch(_){ return false; } }
+
+  // ---------- yearly growth that tracks the player ----------
+  function growYearly(){
+    const pPow = Math.max(1, armyPower());
+    for(const k of K){
+      // growth scales with player's growth, tempered by personality & relation
+      const factor = (k.personality==='Aggressive'?0.10 : k.personality==='Defensive'?0.06 : 0.08);
+      const relAdj = (k.relation==='Friendly'?0.8 : k.relation==='Hostile'?1.2 : 1.0);
+      const delta = Math.floor(pPow*factor*relAdj) + R(10,40);
+      k.power += delta;
+      k.gold  += Math.floor(delta*0.6);
+      // Aggressive kingdoms sometimes harass you
+      if(k.relation==='Hostile' && k.personality==='Aggressive' && chance(0.06)){
+        const dmg = R(2,6);
+        addStat('health', -dmg);
+        log(`${k.flag} ${k.name} raids your borders (you lose ${dmg} health).`, 'danger');
+      }
+    }
+    saveWorld();
+  }
+
+  // ---------- actions ----------
+  function worldPanel(){ const p=document.querySelector('#activityPanel'); if(!p) return; p.innerHTML = renderList(); hookButtons(); }
+  const fmt = (x)=>x.toLocaleString();
+
+  function renderList(){
+    if(!K.length) return `<div class="mini">No known realms.</div>`;
+    return `
+      <div class="sectionLabel">The World — Kingdoms</div>
+      <div class="mini">Your Army Power: <b>${fmt(armyPower())}</b> · Year ${G.year} · Kingdoms: ${K.length}</div>
+      <div class="mini" style="margin-top:4px">Tip: Recon improves intel; big invasions are very hard without overwhelming power.</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:8px">
+        ${K.map(k=>`
+          <div style="border:1px solid #2a3046;border-radius:10px;padding:8px">
+            <div><b>${k.flag} ${k.name}</b></div>
+            <div class="mini">Power ~${fmt(k.power)} · Gold ~${fmt(k.gold)} · ${k.personality}</div>
+            <div class="mini">Relation: <b>${k.relation}${k.allied?' (Allied)':''}</b> · Intel: ${k.intel}/5</div>
+            <div style="margin-top:6px;display:flex;flex-wrap:wrap;gap:6px">
+              <button data-act="scout" data-id="${k.id}">Scout (2g)</button>
+              <button data-act="raid" data-id="${k.id}">Raid</button>
+              <button data-act="invade" data-id="${k.id}">Invade</button>
+              <button data-act="deal" data-id="${k.id}">Negotiate</button>
+              <button data-act="ally" data-id="${k.id}">${k.allied?'Break Alliance':'Propose Alliance'}</button>
+            </div>
+          </div>
+        `).join('')}
+      </div>`;
+  }
+
+  function byId(id){ return K.find(x=>x.id===id); }
+  function hookButtons(){
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    p.addEventListener('click', function on(e){
+      const id=e.target?.dataset?.id, act=e.target?.dataset?.act; if(!id||!act) return;
+      const k=byId(id); if(!k) return;
+      if(act==='scout'){
+        if(G.gold<2){ log('You need 2g to pay scouts.','danger'); return; }
+        addGold(-2);
+        const boost = 1 + (chance(0.35)?1:0);
+        k.intel = clamp((k.intel||0)+boost,0,5);
+        log(`Scouted ${k.flag} ${k.name}. Intel +${boost} (now ${k.intel}/5).`);
+      }
+      if(act==='raid'){
+        const pow=armyPower(), enemy = Math.max(100, Math.floor(k.power * (0.55 - k.intel*0.03)));
+        if(pow < enemy){ log(`Your force (${fmt(pow)}) is too weak to raid ${k.name} (need ~${fmt(enemy)}).`,'danger'); return; }
+        const loot = Math.min(k.gold, R(30,120) + Math.floor(enemy*0.05));
+        addGold(loot); k.gold -= loot; k.relation='Hostile';
+        if(chance(0.35)) k.power = Math.max(500, k.power - R(40,140));
+        log(`Successful raid on ${k.name}: +${fmt(loot)}g. Relations sour.`, 'good');
+      }
+      if(act==='invade'){
+        const pow=armyPower();
+        const enemyBase = Math.max(400, Math.floor(k.power * (0.90 - k.intel*0.05))); // tough
+        const odds = clamp(pow/(enemyBase*1.25), 0.05, 0.95);
+        const win = Math.random()<odds;
+        if(win){
+          const g = k.gold + R(50,150) + Math.floor(enemyBase*0.15);
+          addGold(g); k.gold=0;
+          const cut = R(30,55);
+          k.power = Math.max(200, Math.floor(k.power*(1 - cut/100)));
+          addRep(2); G.army.renown=(G.army.renown||0)+3; if(chance(0.3)) G.army.training++;
+          k.relation='Friendly'; k.allied = chance(0.25) ? true : k.allied;
+          log(`Invasion victory over ${k.name}! Spoils ${fmt(g)}g; their power -${cut}%. (+rep, +renown)`, 'good');
+        }else{
+          addRep(-2);
+          const hp=R(4,10); addStat('health', -hp);
+          // abstract casualties by shaving some troop power proxy: reduce morale & training a bit
+          if(G.army){ G.army.morale = clamp((G.army.morale||0)-R(2,6),0,100); if(chance(0.3)) G.army.training=Math.max(0,(G.army.training||0)-1); }
+          k.relation='Hostile';
+          log(`Invasion of ${k.name} failed. You take ${hp} damage; army morale suffers.`, 'danger');
+        }
+      }
+      if(act==='deal'){
+        const base = 0.45 + (G.stats.charisma||0)/200 + (G.skills?.trade||0)*0.02;
+        if(Math.random()<base){
+          k.relation = (k.relation==='Hostile')?'Neutral':'Friendly';
+          if(k.relation==='Friendly') addRep(1);
+          log(`Talks with ${k.name} improve relations (${k.relation}).`, 'good');
+        } else {
+          log(`${k.name} rebuffs your envoys.`, 'danger');
+        }
+      }
+      if(act==='ally'){
+        if(k.allied){
+          k.allied=false; k.relation='Neutral'; log(`You end the alliance with ${k.name}.`);
+        } else {
+          const need = Math.max(600, Math.floor(k.power*0.4));
+          if(armyPower()<need){ log(`They require a stronger ally (need ~${fmt(need)} power).`,'danger'); }
+          else { k.allied=true; k.relation='Friendly'; addRep(1); log(`${k.name} swears mutual aid. (+rep)`,'good'); }
+        }
+      }
+      saveWorld();
+      worldPanel();
+    }, {once:false});
+  }
+
+  // ---------- Activities row button + shortcut ----------
+  function ensureWorldButton(){
+    if(document.getElementById('actWorld')) return;
+    const row=document.querySelector('#actCrime')?.parentElement; if(!row) return;
+    const b=document.createElement('button'); b.id='actWorld'; b.textContent='World — Kingdoms';
+    b.onclick=worldPanel; row.appendChild(b);
+  }
+  ensureWorldButton();
+  document.addEventListener('keydown',e=>{ if(e.key.toLowerCase()==='w') worldPanel(); });
+
+  // ---------- Yearly growth hook ----------
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    _ageUp();
+    growYearly(); // grow after your year processes (wages/promotions/etc.)
+  };
+
+  // ---------- boot ----------
+  if(!loadWorld()) initWorld();
+  // When you open Army (A), you often want to check rivals; keep both available.
+
+})();
+// ===== EXT: Heroes & Relics (Bitlike Starter + Army compatible) ==================
+// Adds hireable heroes and rare relics with passive army bonuses.
+// Activities button "Heroes & Relics" (shortcut H). Idempotent & save-safe.
+// ================================================================================
+(function(){
+  if (window.HeroesRelicsExt) return; window.HeroesRelicsExt = true;
+
+  // ---------- Small glue to your base ----------
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const chance=p=>Math.random()<p;
+  function log(t,cls){ const el=document.querySelector('#log'); const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; }
+  function addGold(n){ G.gold=Math.max(0,G.gold+n); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; }
+  function addRep(n){ G.rep=clamp(G.rep+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; }
+  function addStat(k,n){ G.stats[k]=clamp(G.stats[k]+n,0,100); }
+
+  // A lightweight army power read (works with your basic + advanced units)
+  const PW = { militia:1, archers:1.6, cavalry:3,
+    spearmen:1.3, pikemen:1.8, crossbow:2.1, skirmishers:1.2,
+    heavy_inf:2.6, light_cav:2.2, knights:4.0, engineers:0.6, sappers:0.9, medics:0.2 };
+  function armyPower(){
+    const A=G.army?.troops||{}; let base=0;
+    for(const k in A){ base += (A[k]||0)*(PW[k]||1); }
+    const train=1+Math.min(0.5,(G.army?.training||0)*0.05);
+    const mor  =0.8+(G.army?.morale||0)/100;
+    const relicAdd=(G.army?.heroMods?.powerAdd||0);
+    const relicMul=(G.army?.heroMods?.powerMul||1);
+    return Math.floor((base*train*mor + relicAdd) * relicMul);
+  }
+
+  // ---------- Data / Storage ----------
+  const SAVE='ml-heroes-relics-v1';
+  if (!G.army) G.army={troops:{}, morale:50, training:0, supply:0, renown:0, banner:'None'};
+  if (!G.army.heroMods) G.army.heroMods={powerAdd:0,powerMul:1,moraleAdd:0,lootMul:1,lossRed:0.0,ambBonus:0,siegeBonus:0};
+  let HR={ heroes:[], relics:[], shop:{heroes:[], relics:[], nextYear:0} };
+
+  const HERO_POOL=[
+    {key:'warlord', name:'Warlord', hire:600, upkeep:60, txt:'+flat power & morale on wins', mods:{powerAdd:40}},
+    {key:'strategist', name:'Strategist', hire:700, upkeep:60, txt:'+ambush/siege bonuses; chance +training each big win', mods:{ambBonus:3,siegeBonus:2}},
+    {key:'chaplain', name:'Chaplain', hire:400, upkeep:30, txt:'Yearly morale regen; lowers losses', mods:{lossRed:0.15}},
+    {key:'quarter', name:'Quartermaster', hire:550, upkeep:40, txt:'Cheaper advanced supplies; +1 supply on some years'},
+    {key:'assassin', name:'Assassin', hire:650, upkeep:50, txt:'Small enemy power penalty when you invade'},
+    {key:'bard', name:'Bard', hire:350, upkeep:20, txt:'+rep & happiness from victories'},
+    {key:'alchemist', name:'Alchemist', hire:750, upkeep:60, txt:'Heals you a bit after battles; rare battle boosts'},
+    {key:'engineer', name:'Engineer', hire:600, upkeep:50, txt:'+siege bonus & chance to avoid losses on sieges', mods:{siegeBonus:3}}
+  ];
+  const RELIC_POOL=[
+    {key:'banner',  name:'Banner of Dawn',   rarity:'Epic',      cost:800,  mods:{moraleAdd:4, powerMul:1.05}},
+    {key:'sword',   name:'Sword of Ashenvale', rarity:'Epic',    cost:1100, mods:{powerAdd:70}},
+    {key:'horn',    name:'Dragonhorn',       rarity:'Legendary', cost:2000, mods:{powerMul:1.15, moraleAdd:6}},
+    {key:'crown',   name:'Crown of Thorns',  rarity:'Epic',      cost:1200, mods:{lootMul:1.15}},
+    {key:'cloak',   name:'Shadow Cloak',     rarity:'Epic',      cost:950,  mods:{ambBonus:4}},
+    {key:'relic',   name:'Saint’s Fingerbone',rarity:'Legendary',cost:1800, mods:{lossRed:0.25, moraleAdd:5}},
+    {key:'compass', name:'Siege Compass',    rarity:'Epic',      cost:900,  mods:{siegeBonus:4}},
+    {key:'ledger',  name:'Ledger of Coin',   rarity:'Epic',      cost:850,  mods:{lootMul:1.2}}
+  ];
+
+  function save(){ try{ localStorage.setItem(SAVE, JSON.stringify(HR)); }catch(_){} }
+  function load(){ try{ const raw=localStorage.getItem(SAVE); if(!raw) return false; HR=JSON.parse(raw)||HR; return true; }catch(_){ return false; } }
+
+  // ---------- Shop / Generation ----------
+  function randPick(arr,n){ const copy=arr.slice(); const out=[]; while(copy.length && out.length<n){ out.push(copy.splice(R(0,copy.length-1),1)[0]); } return out; }
+  function rollShop(force=false){
+    if(!force && G.year<=HR.shop.nextYear && HR.shop.heroes.length && HR.shop.relics.length) return;
+    HR.shop.heroes = randPick(HERO_POOL, 2);
+    HR.shop.relics = randPick(RELIC_POOL, 3);
+    HR.shop.nextYear = G.year + 1 + R(0,1);
+    save();
+  }
+
+  // ---------- Hiring / Buying / Equipping ----------
+  function hire(h){
+    if(HR.heroes.some(x=>x.key===h.key)) return log('Already hired.');
+    if(G.gold<h.hire) return log('Not enough gold.','danger');
+    addGold(-h.hire);
+    HR.heroes.push({key:h.key, name:h.name, upkeep:h.upkeep, txt:h.txt, mods:h.mods||{}, relic:null});
+    log(`Hired ${h.name}.`,'good'); recalcMods(); save(); openPanel();
+  }
+  function buy(r){
+    if(HR.relics.some(x=>x.key===r.key)) return log('You already own this relic.');
+    if(G.gold<r.cost) return log('Not enough gold.','danger');
+    addGold(-r.cost);
+    HR.relics.push({key:r.key,name:r.name,rarity:r.rarity,mods:r.mods, equipped:false});
+    log(`Acquired ${r.rarity} relic: ${r.name}.`,'good'); recalcMods(); save(); openPanel();
+  }
+  function equip(relicKey, heroKey){
+    const rel=HR.relics.find(x=>x.key===relicKey); const hero=HR.heroes.find(x=>x.key===heroKey);
+    if(!rel||!hero) return;
+    // unequip from any other hero
+    HR.heroes.forEach(h=>{ if(h.relic===relicKey) h.relic=null; });
+    hero.relic = relicKey; rel.equipped=true;
+    log(`${hero.name} equips ${rel.name}.`); recalcMods(); save(); openPanel();
+  }
+  function dismiss(heroKey){
+    const idx=HR.heroes.findIndex(x=>x.key===heroKey); if(idx<0) return;
+    const h=HR.heroes[idx]; HR.heroes.splice(idx,1);
+    // free up relic
+    if(h.relic){ const r=HR.relics.find(x=>x.key===h.relic); if(r) r.equipped=false; }
+    log(`You release ${h.name} from service.`); recalcMods(); save(); openPanel();
+  }
+
+  // ---------- Mods aggregator ----------
+  function mergeMods(into,mods){ if(!mods) return; for(const k in mods){ if(k==='lossRed'||k==='powerMul'||k==='lootMul'){ into[k]=(into[k]||1)*mods[k]; } else { into[k]=(into[k]||0)+mods[k]; } } }
+  function recalcMods(){
+    const m={powerAdd:0,powerMul:1,moraleAdd:0,lootMul:1,lossRed:0,ambBonus:0,siegeBonus:0};
+    HR.heroes.forEach(h=>{ mergeMods(m,h.mods); const r=HR.relics.find(x=>x.key===h.relic); if(r) mergeMods(m,r.mods); });
+    // lossRed stacks multiplicatively; convert to 1 - product
+    if(typeof m.lossRed==='number' && m.lossRed>0 && m.lossRed<1){
+      // already multiplicative via merge; ok
+    }
+    G.army.heroMods=m;
+  }
+
+  // ---------- Yearly hooks (upkeep + passive effects) ----------
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    // upkeep
+    let due=0; HR.heroes.forEach(h=>due+=h.upkeep||0);
+    if(due>0){
+      if(G.gold>=due){ addGold(-due); log(`Hero upkeep paid: ${due}g.`); }
+      else { log(`Couldn’t cover hero upkeep (${due}g). Some leave.`, 'danger');
+        // dismiss one at random
+        if(HR.heroes.length){ const gone=HR.heroes.splice(R(0,HR.heroes.length-1),1)[0]; log(`${gone.name} departs.`, 'danger'); }
+      }
+    }
+
+    // passive bonuses
+    if(HR.heroes.some(h=>h.key==='chaplain')){ if(G.army) G.army.morale = clamp((G.army.morale||0)+3,0,100); log('Your Chaplain restores morale (+3).'); }
+    if(HR.heroes.some(h=>h.key==='quarter')){ if(G.army) G.army.supply = (G.army.supply||0)+(chance(0.4)?1:0); }
+    if(HR.heroes.some(h=>h.key==='bard')){ addRep(1); addStat('happiness',1); }
+    if(HR.heroes.some(h=>h.key==='alchemist')){ addStat('health', R(0,2)); }
+
+    // shop rotation
+    rollShop();
+
+    _ageUp();
+    recalcMods(); // keep m up-to-date after other scripts touch army
+  };
+
+  // ---------- Quests for free relics ----------
+  function runHeroQuest(){
+    if(G.gold<5){ log('You need 5g to fund a quest.','danger'); return; }
+    addGold(-5);
+    const pow=armyPower();
+    const odds = clamp(0.25 + (G.army?.heroMods?.ambBonus||0)*0.02 + (pow/8000), 0.2, 0.85);
+    if(Math.random()<odds){
+      const prize = randPick(RELIC_POOL.filter(r=>!HR.relics.some(x=>x.key===r.key)),1)[0] || randPick(RELIC_POOL,1)[0];
+      HR.relics.push({key:prize.key,name:prize.name,rarity:prize.rarity,mods:prize.mods,equipped:false});
+      log(`Quest succeeds! Found ${prize.rarity} ${prize.name}.`,'good');
+      recalcMods(); save(); openPanel();
+    } else {
+      log('Quest fails. A ballad of almosts.'); addStat('health',-R(0,2));
+    }
+  }
+
+  // ---------- UI ----------
+  function fmt(n){ return n.toLocaleString(); }
+  function openPanel(){
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    recalcMods(); rollShop();
+    const mods=G.army.heroMods||{};
+    p.innerHTML = `
+      <div class="sectionLabel">Heroes & Relics</div>
+      <div class="mini">Army Power (with bonuses): <b>${fmt(armyPower())}</b> · Mods — +Power ${mods.powerAdd||0}, ×${(mods.powerMul||1).toFixed(2)}, Morale +${mods.moraleAdd||0}, Loot ×${(mods.lootMul||1).toFixed(2)}, Loss −${Math.round((1-(1/(mods.lossRed?1/(1-mods.lossRed):1)))*100)||0}%</div>
+      <div class="hr"></div>
+
+      <div class="sectionLabel">Your Heroes</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:6px">
+        ${HR.heroes.length?HR.heroes.map(h=>{
+          const r = HR.relics.find(x=>x.key===h.relic);
+          return `<div style="border:1px solid #2a3046;border-radius:10px;padding:8px">
+            <b>${h.name}</b> · Upkeep ${h.upkeep}g/yr
+            <div class="mini">${h.txt}</div>
+            <div class="mini">Relic: ${r?`${r.rarity} ${r.name}`:'—'}</div>
+            <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+              ${HR.relics.map(rr=>`<button data-equip="${rr.key}" data-hero="${h.key}" class="mini"${h.relic===rr.key?' disabled':''}>Equip: ${rr.name}</button>`).join('')}
+              <button data-dismiss="${h.key}" class="mini">Dismiss</button>
+            </div>
+          </div>`;
+        }).join(''):`<div class="mini">No heroes yet. Visit the shop below or run a Quest.</div>`}
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Relics Owned</div>
+      <div class="mini">${HR.relics.length?HR.relics.map(r=>`${r.rarity} ${r.name}`).join(' · '):'none'}</div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Guild Shop</div>
+      <div class="mini">Rotates by year (next refresh by Year ${HR.shop.nextYear}).</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:8px;margin-top:6px">
+        ${HR.shop.heroes.map(h=>`
+          <div style="border:1px solid #2a3046;border-radius:10px;padding:8px">
+            <b>${h.name}</b> · Hire ${h.hire}g · Upkeep ${h.upkeep}g/yr
+            <div class="mini">${h.txt}</div>
+            <button data-hire="${h.key}">Hire</button>
+          </div>`).join('')}
+        ${HR.shop.relics.map(r=>`
+          <div style="border:1px solid #2a3046;border-radius:10px;padding:8px">
+            <b>${r.rarity} ${r.name}</b> · ${r.cost}g
+            <div class="mini">Effects: ${Object.keys(r.mods).join(', ')}</div>
+            <button data-buy="${r.key}">Buy</button>
+          </div>`).join('')}
+      </div>
+
+      <div class="hr"></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap">
+        <button id="quest">Send Hero Quest (5g)</button>
+      </div>
+    `;
+
+    // handlers
+    p.querySelector('#quest').onclick=runHeroQuest;
+    p.addEventListener('click', (e)=>{
+      const k1=e.target?.dataset?.hire; if(k1){ const H=HERO_POOL.find(x=>x.key===k1); if(H) hire(H); return; }
+      const k2=e.target?.dataset?.buy; if(k2){ const Rr=RELIC_POOL.find(x=>x.key===k2); if(Rr) buy(Rr); return; }
+      const eq=e.target?.dataset?.equip, hk=e.target?.dataset?.hero; if(eq&&hk){ equip(eq,hk); return; }
+      const dis=e.target?.dataset?.dismiss; if(dis){ dismiss(dis); return; }
+    }, {once:true});
+  }
+
+  // ---------- Activities row button + shortcut ----------
+  function ensureButton(){
+    if(document.getElementById('actHeroes')) return;
+    const row=document.querySelector('#actCrime')?.parentElement; if(!row) return;
+    const b=document.createElement('button'); b.id='actHeroes'; b.textContent='Heroes & Relics';
+    b.onclick=openPanel; row.appendChild(b);
+  }
+  ensureButton();
+  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='h') openPanel(); });
+
+  // ---------- Boot ----------
+  if(!load()){ HR={ heroes:[], relics:[], shop:{heroes:[], relics:[], nextYear:G.year+1} }; }
+  rollShop(true); recalcMods();
+
+  // Optional: show hero mods inline in Career box (like the Army mini line)
+  const _renderCareer = window.renderCareer;
+  if(_renderCareer){
+    window.renderCareer = function(){ _renderCareer(); const box=document.getElementById('careerBox'); if(!box) return;
+      const m=G.army.heroMods||{}; const line=`<div class="mini" id="heroMini">Heroes — +Pow ${m.powerAdd||0} ×${(m.powerMul||1).toFixed(2)} · Loot ×${(m.lootMul||1).toFixed(2)} · Loss −${Math.round((m.lossRed||0)*100)}%</div>`;
+      const el=document.getElementById('heroMini'); if(el) el.outerHTML=line; else box.insertAdjacentHTML('beforeend', line);
+    };
+    window.renderCareer();
+  }
+})();
+// ==== EXT: Prestige & Legacy (Dynasty • Religion • Culture • Hall of Fame) ====
+(function(){
+  if (window.LegacyExt) return; window.LegacyExt = true;
+
+  // -------- glue to base -----------
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const chance=p=>Math.random()<p;
+  function log(t,cls){ const el=document.querySelector('#log'); const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; }
+  function addGold(n){ G.gold=Math.max(0,G.gold+n); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; }
+  function addRep(n){ G.rep=clamp(G.rep+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; }
+  function addStat(k,n){ G.stats[k]=clamp(G.stats[k]+n,0,100); }
+  const haveWorld = !!window.WorldKingdomsExt; // World — Kingdoms expansion present?
+
+  // name helpers from starter (fallbacks if not present)
+  const NAMES_M = window.NAMES_M || ["Thomas","John","William","Hugh","Robert","Geoffrey","Peter","Walter","Richard","Alan","Adam"];
+  const NAMES_F = window.NAMES_F || ["Matilda","Alice","Eleanor","Isabel","Joan","Agnes","Margery","Cecily","Emma","Beatrice","Edith"];
+  const SURNAMES = window.SURNAMES || ["of Ashford","the Miller","of York","the Smith","of Dunwich","the Baker","of Kent","of Wye","the Tanner","of Fens"];
+  function newName(sex){ const first = sex==='F'?NAMES_F[R(0,NAMES_F.length-1)]:NAMES_M[R(0,NAMES_M.length-1)]; return `${first} ${SURNAMES[R(0,SURNAMES.length-1)]}`; }
+
+  // A light army power estimate (compatible with your Army packs)
+  const PW = { militia:1, archers:1.6, cavalry:3,
+    spearmen:1.3, pikemen:1.8, crossbow:2.1, skirmishers:1.2,
+    heavy_inf:2.6, light_cav:2.2, knights:4.0, engineers:0.6, sappers:0.9, medics:0.2 };
+  function armyPower(){
+    const A=G.army?.troops||{}; let base=0;
+    for(const k in A){ base+=(A[k]||0)*(PW[k]||1); }
+    const train = 1 + Math.min(0.5,(G.army?.training||0)*0.05);
+    const mor   = 0.8 + (G.army?.morale||0)/100;
+    const hm = G.army?.heroMods||{powerMul:1,powerAdd:0};
+    return Math.floor((base*train*mor + (hm.powerAdd||0))*(hm.powerMul||1));
+  }
+
+  // -------- persistent state ----------
+  const SAVE_L = 'ml-legacy-core-v1';
+  const SAVE_HOF = 'ml-hof-v1'; // cross-save
+  const L = loadObj(SAVE_L, {
+    dynasty:{enabled:false,name:'House of Ash', generation:1, prestige:0},
+    religion:{founded:false,name:'—', followers:0, tenet:'None'},
+    culture:{name:'Lowlands', influence:{}}, // {kingdomId: score 0..100}
+  });
+  const HOF = loadObj(SAVE_HOF, {records:[]}); // capped list
+
+  function loadObj(key,def){ try{ const raw=localStorage.getItem(key); if(!raw) return def; const x=JSON.parse(raw); return x||def; }catch(_){ return def; } }
+  function saveObj(key,obj){ try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(_){} }
+  function saveAll(){ saveObj(SAVE_L,L); saveObj(SAVE_HOF,HOF); }
+
+  // -------- activities button ----------
+  function ensureLegacyButton(){
+    if(document.getElementById('actLegacy')) return;
+    const row=document.querySelector('#actCrime')?.parentElement; if(!row) return;
+    const b=document.createElement('button'); b.id='actLegacy'; b.textContent='Legacy';
+    b.onclick=openLegacy; row.appendChild(b);
+  }
+  ensureLegacyButton();
+  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='l') openLegacy(); });
+
+  // -------- UI panel ----------
+  function fmt(n){ return n.toLocaleString(); }
+  function openLegacy(){
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    const kp = armyPower();
+    const inflList = Object.entries(L.culture.influence||{});
+    p.innerHTML = `
+      <div class="sectionLabel">Prestige & Legacy</div>
+      <div class="mini">Dynasty: <b>${L.dynasty.name}</b> · Gen <b>${L.dynasty.generation}</b> · Prestige <b>${L.dynasty.prestige}</b> · Army Power ${fmt(kp)}</div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button id="togDyn">${L.dynasty.enabled?'Disable':'Enable'} Dynasty Mode</button>
+        <button id="renameDyn" class="mini">Rename Dynasty</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Found a Religion</div>
+      <div class="mini">Followers <b>${fmt(L.religion.followers)}</b> · Tenet: <b>${L.religion.tenet}</b> · Name: <b>${L.religion.name}</b></div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button id="foundRel"${L.religion.founded?' disabled':''}>Found Religion (50g & 60 Piety)</button>
+        <button id="setTenet"${!L.religion.founded?' disabled':''}>Choose Tenet</button>
+        <button id="rally"${!L.religion.founded?' disabled':''}>Rally Followers</button>
+      </div>
+      <div class="mini">Bonuses: followers grow yearly with your piety/rep; tenets grant unique buffs (e.g., War Blessing, Tithes, Pilgrimage).</div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Cultural Influence</div>
+      <div class="mini">Culture: <b>${L.culture.name}</b> · Spread your culture to kingdoms for passive sway.</div>
+      <div class="row" style="gap:6px;flex-wrap:wrap;margin-top:6px">
+        <button id="renameCult" class="mini">Rename Culture</button>
+        <button id="spread"${haveWorld?'':' disabled'}>Spread Campaign (if World—Kingdoms present)</button>
+      </div>
+      <div class="mini" style="margin-top:6px">${inflList.length?inflList.map(([id,v])=>`#${id.slice(-4)}: ${v}/100`).join(' · '):'No regions influenced yet.'}</div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Hall of Fame</div>
+      <div class="mini">Permanent records across saves (top 20). New reigns are recorded on death.</div>
+      <div style="margin-top:6px">
+        ${HOF.records.length?HOF.records.slice().reverse().map(r=>`
+          <div class="mini" style="border:1px solid #2a3046;border-radius:10px;padding:6px;margin:4px 0">
+            <b>${r.name}</b> of <b>${r.dynasty}</b> — Gen ${r.gen} · Age ${r.age} · Year ${r.year}
+            · Gold ${fmt(r.gold)} · Rep ${r.rep} · Renown ${r.renown} · Army Pow ${fmt(r.armyPow)}
+          </div>`).join(''):'<div class="mini">No entries yet.</div>'}
+      </div>
+    `;
+
+    // handlers
+    p.querySelector('#togDyn').onclick=()=>{ L.dynasty.enabled=!L.dynasty.enabled; saveAll(); openLegacy(); log(`Dynasty Mode ${L.dynasty.enabled?'enabled':'disabled'}.`); };
+    p.querySelector('#renameDyn').onclick=()=>{ const n=prompt('Enter dynasty name:', L.dynasty.name||'House of Ash'); if(n){ L.dynasty.name=n.slice(0,40); saveAll(); openLegacy(); } };
+    p.querySelector('#renameCult').onclick=()=>{ const n=prompt('Enter culture name:', L.culture.name||'Lowlands'); if(n){ L.culture.name=n.slice(0,40); saveAll(); openLegacy(); } };
+    p.querySelector('#foundRel').onclick=()=>{ if(L.religion.founded) return;
+      if(G.stats.piety<60 || G.gold<50){ log('Founding requires 60 Piety and 50g.','danger'); return; }
+      const n=prompt('Name of your faith:', 'The Dawnward Path')||'The Dawnward Path';
+      addGold(-50); addStat('piety',-10); L.religion={founded:true,name:n.slice(0,40),followers: R(80,160), tenet:'None'};
+      L.dynasty.prestige += 5; saveAll(); openLegacy(); log(`You proclaim ${L.religion.name}. Followers gather! (+prestige)`, 'good');
+    };
+    p.querySelector('#setTenet').onclick=()=>{ if(!L.religion.founded) return;
+      const t = prompt('Choose tenet: War / Wealth / Pilgrimage', L.religion.tenet||'War')||'War';
+      const map = { 'War':'War Blessing (+morale, +battle power)', 'Wealth':'Tithes (+loot)', 'Pilgrimage':'Pilgrimage (+happiness, +piety growth)' };
+      const key = /wealth/i.test(t)?'Wealth' : /p(il|ilgr)/i.test(t)?'Pilgrimage' : 'War';
+      L.religion.tenet = key; saveAll(); openLegacy(); log(`Tenet chosen: ${key} — ${map[key]}.`);
+    };
+    p.querySelector('#rally').onclick=()=>{ if(!L.religion.founded) return;
+      if(G.gold<3) return log('Need 3g to print lives of saints.','danger');
+      addGold(-3); const add = 20 + Math.floor((G.stats.charisma||0)/3) + R(0,30);
+      L.religion.followers += add; L.dynasty.prestige += 1; saveAll(); openLegacy(); log(`You rally the faithful (+${add} followers, +prestige).`,'good');
+    };
+    if(haveWorld) p.querySelector('#spread').onclick=()=>campaignCulture();
+  }
+
+  // -------- yearly hooks (growth + bonuses) ----------
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    // Religion growth & bonuses
+    if(L.religion.founded){
+      const base = 10 + Math.floor((G.stats.piety||0)/4) + Math.floor((G.rep||0)/3);
+      const gain = Math.max(0, base + R(-10,20));
+      L.religion.followers += gain;
+
+      // Tenet effects
+      if(L.religion.tenet==='War'){ if(G.army) G.army.morale = clamp((G.army.morale||0)+2,0,100); L.dynasty.prestige += 1; }
+      if(L.religion.tenet==='Wealth'){ const tithe = Math.floor(Math.min(40, L.religion.followers/30)); addGold(tithe); }
+      if(L.religion.tenet==='Pilgrimage'){ addStat('happiness',2); addStat('piety',1); }
+
+      // passive: little power bump felt in ops via morale/train; also prestige trickle
+      if(chance(0.15)) L.dynasty.prestige += 1;
+    }
+
+    // Culture slow spread (if world present, also nudge relations)
+    if(haveWorld && window.WorldKingdomsExt){
+      try{
+        const all = window.KingdomsAPI?.getAll?.()||[];
+        if(all.length){
+          const target = all[R(0,all.length-1)];
+          const inc = 1 + Math.floor((G.stats.charisma||0)/40) + (L.religion.founded?1:0);
+          L.culture.influence[target.id] = clamp((L.culture.influence[target.id]||0)+inc, 0, 100);
+          // cultural sway soften hostility
+          if(L.culture.influence[target.id]>60 && target.relation==='Hostile' && chance(0.25)){ target.relation='Neutral'; log(`${target.name} warms to your culture.`); }
+          if(L.culture.influence[target.id]>85 && chance(0.15)) { target.allied=true; target.relation='Friendly'; log(`${target.name} adopts ${L.culture.name} customs (alliance).`,'good'); }
+          window.KingdomsAPI?.rebuild?.();
+        }
+      }catch(_){}
+    }
+
+    // shop/other yearly effects finish, then save
+    saveAll();
+    _ageUp();
+  };
+
+  // -------- culture campaign (manual) ----------
+  function campaignCulture(){
+    const all = window.KingdomsAPI?.getAll?.()||[];
+    if(!all.length) { log('No known kingdoms to influence.','danger'); return; }
+    const idxStr = prompt(`Choose target index 1..${all.length}\n`+all.map((k,i)=>`${i+1}. ${k.name} (influence ${L.culture.influence[k.id]||0}/100)`).join('\n'), '1');
+    const i = Math.max(1, Math.min(all.length, parseInt(idxStr||'1',10)))-1;
+    const k=all[i]; if(!k) return;
+    if(G.gold<5){ log('Need 5g to sponsor a poet & envoy.','danger'); return; }
+    addGold(-5);
+    const boost = 5 + Math.floor((G.stats.charisma||0)/20) + R(0,8);
+    L.culture.influence[k.id] = clamp((L.culture.influence[k.id]||0)+boost,0,100);
+    log(`Cultural mission to ${k.name}: influence +${boost} (now ${L.culture.influence[k.id]}/100).`,'good');
+    saveAll(); window.KingdomsAPI?.rebuild?.();
+  }
+
+  // -------- Hall of Fame + Dynasty continuation ----------
+  function pushHallOfFame(reason){
+    const rec = {
+      ts: Date.now(),
+      name: G.name, sex: G.sex, age: G.age, year: G.year,
+      dynasty: L.dynasty.name, gen: L.dynasty.generation,
+      gold: G.gold, rep: G.rep, renown: (G.army?.renown||0),
+      armyPow: armyPower(), reason
+    };
+    HOF.records.push(rec); if(HOF.records.length>20) HOF.records = HOF.records.slice(-20);
+    saveAll();
+  }
+
+  function makeHeir(){
+    const sex = Math.random()<0.5?'M':'F';
+    const nm = newName(sex);
+    // soften reset, inherit some wealth & prestige
+    const inheritGold = Math.floor(G.gold*0.45) + L.dynasty.prestige*2;
+    const prestigeBump = Math.min(20, Math.floor((L.religion.followers||0)/200));
+    const title = (L.dynasty.generation>=3 && L.dynasty.prestige>25) ? 'Lord' : '';
+
+    // reset personal stats
+    G.sex=sex; G.name=nm; G.age=0; G.alive=true; G.title=title;
+    G.stats.health=R(55,85); G.stats.happiness=R(45,75);
+    G.stats.piety=R(25,60)+(L.religion.founded?3:0);
+    G.stats.smarts=R(30,75); G.stats.charisma=R(30,75);
+    G.skills.combat=Math.max(0,(G.skills.combat||0)-R(0,1));
+    G.skills.trade=Math.max(0,(G.skills.trade||0)-R(0,1));
+    G.skills.literacy=Math.max(G.skills.literacy||0, (L.dynasty.generation>=2?1:0));
+    G.gold=inheritGold; G.rep=Math.max(0, Math.floor(G.rep*0.5)+Math.floor(L.dynasty.prestige/5));
+    // inherit a fraction of army
+    if(G.army?.troops){
+      for(const k in G.army.troops){ G.army.troops[k]=Math.floor((G.army.troops[k]||0)*0.4); }
+      G.army.training=Math.max(0, Math.floor((G.army.training||0)*0.6));
+      G.army.morale=clamp((G.army.morale||0)-R(0,10)+5,0,100);
+    }
+    // dynasty bookkeeping
+    L.dynasty.generation += 1;
+    L.dynasty.prestige += 5 + prestigeBump;
+    log(`A new heir rises: ${G.name} of ${L.dynasty.name}. Generation ${L.dynasty.generation}.`,'good');
+    saveAll();
+    // refresh UI
+    if(typeof window.renderAll==='function') window.renderAll();
+  }
+
+  // wrap death(): record HoF entry and (optionally) continue as heir
+  if(typeof window.death==='function'){
+    const _death = window.death;
+    window.death = function(reason){
+      try{ pushHallOfFame(reason||'Unknown'); }catch(_){}
+      if(L.dynasty.enabled){
+        // show a softer message then continue with heir
+        log('Your reign ends, but your bloodline endures.','good');
+        makeHeir();
+        // Do NOT call base death UI; we keep playing
+        return;
+      }
+      _death(reason);
+    };
+  }
+
+  // -------- small integration with Army Ops (optional soft buffs) ----------
+  // expose a read-only hook other scripts may consult
+  window.LegacyAPI = {
+    dynasty: ()=>({...L.dynasty}),
+    religion: ()=>({...L.religion}),
+    culture: ()=>({...L.culture}),
+    hof: ()=>HOF.records.slice()
+  };
+
+  // -------- boot once ----------
+  // insert a tiny line in Career box with dynasty info
+  const _renderCareer = window.renderCareer;
+  if(_renderCareer){
+    window.renderCareer = function(){ _renderCareer(); const box=document.getElementById('careerBox'); if(!box) return;
+      const line = `<div class="mini" id="dynMini">Dynasty — ${L.dynasty.name}, Gen ${L.dynasty.generation}, Prestige ${L.dynasty.prestige}${L.religion.founded?` · Faith: ${L.religion.name}`:''}</div>`;
+      const el=document.getElementById('dynMini'); if(el) el.outerHTML=line; else box.insertAdjacentHTML('beforeend', line);
+    };
+    window.renderCareer();
+  }
+})();
+// =================== YOUTH MODE — CLEAN REBUILD ==============================
+// Age < 18: replaces Activities with a Youth panel (train, friends, tiny jobs).
+// Hides all adult tabs; fair friend difficulty; micro-pay (<=0.1g); badges work.
+// Clears on Hard Reset/New Life; converts to adult bonuses at 18.
+// ============================================================================
+(function(){
+  if (window.YOUTH_V3) return; window.YOUTH_V3 = true;
+
+  // ---- utils ----
+  const SAVE='ml-youth-v1';
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const chance=p=>Math.random()<p;
+  const log=(t,cls)=>{ const el=document.querySelector('#log'); if(!el) return;
+    const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; };
+  const setGold=(n)=>{ G.gold = Math.max(0, +(n.toFixed(1))); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; };
+  const addGold=(n)=>setGold((G.gold||0)+n);
+  const addRep=(n)=>{ G.rep=clamp((G.rep||0)+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; };
+  const addStat=(k,n)=>{ G.stats[k]=clamp((G.stats[k]||0)+n,0,100); };
+  const addSkill=(k,n)=>{ G.skills[k]=Math.max(0,(G.skills[k]||0)+(n||0)); };
+
+  const isMinor=()=> (G.age||0)<18;
+
+  // ---- state ----
+  const newState = ()=>({
+    respect:0, crewPow:0,
+    friends:[], // {name,str,loyal,role}
+    rivals:[],  // {name,mean}
+    gear:{slings:0,sticks:0},
+    bullyMeter:0,
+    training:{combat:0,literacy:0,charm:0},
+    badge:null // 'Bookish' | 'Roughnecks' | 'Kindred'
+  });
+  function load(){ try{ return JSON.parse(localStorage.getItem(SAVE)||'null')||newState(); }catch(_){ return newState(); } }
+  function save(){ try{ localStorage.setItem(SAVE, JSON.stringify(Y)); }catch(_){ } }
+  let Y = load();
+
+  // ---- hard reset / new life wipe ----
+  function wipeYouth(){ Y=newState(); save(); }
+  document.addEventListener('click', e=>{
+    const t=e.target;
+    if (t && (t.id==='reset' || t.closest?.('#reset'))) { try{ localStorage.removeItem(SAVE);}catch(_){}
+    }
+  }, true);
+  // if starting at age 0 or base save missing, ensure fresh youth
+  setTimeout(()=>{ if((G.age??0)===0) wipeYouth(); }, 200);
+
+  // ---- badges ----
+  const badgeInfo = {
+    Bookish:{desc:'+1 literacy gain when training', lit:+1, cmb:0, loyal:0},
+    Roughnecks:{desc:'+1 combat gain when training', lit:0, cmb:+1, loyal:0},
+    Kindred:{desc:'+20% loyalty chance when making friends', lit:0, cmb:0, loyal:+0.20},
+  };
+  const badgeDesc = b => badgeInfo[b]?.desc || 'No bonus';
+
+  // ---- locks: only Youth button visible when minor ----
+  function ensureYouthButton(){
+    if(document.getElementById('actYouth')) return;
+    const row=document.querySelector('#actCrime')?.parentElement; if(!row) return;
+    const b=document.createElement('button'); b.id='actYouth'; b.textContent='Youth';
+    b.onclick=openYouth; row.appendChild(b);
+  }
+  ensureYouthButton();
+
+  function applyLocks(){
+    const row=document.querySelector('#actStudy')?.parentElement
+             || document.querySelector('#activityPanel')?.previousElementSibling;
+    if(!row) return;
+    row.querySelectorAll('button[id^="act"]').forEach(btn=>{
+      if (btn.id==='actYouth'){ btn.style.display=''; btn.disabled=false; return; }
+      if (isMinor()){ btn.style.display='none'; btn.disabled=true; btn.dataset.youthHidden='1'; }
+      else if (btn.dataset.youthHidden){ btn.style.display=''; btn.disabled=false; delete btn.dataset.youthHidden; }
+    });
+  }
+  const _renderAll = window.renderAll; window.renderAll=function(){ _renderAll?.(); applyLocks(); };
+  const _ageUpBase = window.ageUp; window.ageUp=function(){ _ageUpBase?.(); applyLocks(); };
+
+  // prevent stray clicks on hidden tabs
+  document.addEventListener('click', e=>{
+    if(!isMinor()) return;
+    const b=e.target?.closest?.('button[id^="act"]'); if(!b||b.id==='actYouth') return;
+    e.preventDefault(); e.stopImmediatePropagation(); document.getElementById('actYouth')?.click();
+  }, true);
+
+  // ---- view crew ----
+  function openCrew(){
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    p.innerHTML = `
+      <div class="sectionLabel">Your Crew</div>
+      <div class="mini">Badge: <b>${Y.badge||'—'}</b> · Crew Power <b>${Y.crewPow}</b></div>
+      <div class="mini">Passive: ${badgeDesc(Y.badge)}</div>
+      <div style="margin-top:8px">
+        ${Y.friends.length?Y.friends.map((f,i)=>`
+          <div style="border:1px solid #2a2a38;border-radius:10px;padding:6px;margin:4px 0">
+            <b>${f.name}</b> — STR ${f.str} ${f.loyal?'· Loyal':''} ${f.role?`· ${f.role}`:''}
+            <div style="float:right;display:flex;gap:6px">
+              <button data-r="${i}">Remove</button>
+            </div>
+          </div>
+        `).join(''):'<i>No friends yet.</i>'}
+      </div>
+      <div style="margin-top:10px"><button id="crewBack">← Youth</button></div>
+    `;
+    p.querySelector('#crewBack')?.addEventListener('click', openYouth);
+    p.querySelectorAll('button[data-r]').forEach(b=>{
+      b.onclick=()=>{
+        const i=+b.dataset.r; const f=Y.friends.splice(i,1)[0];
+        if(f) Y.crewPow=Math.max(0, Y.crewPow-(f.str+(f.loyal?1:0)));
+        save(); openCrew();
+      };
+    });
+  }
+
+  // ---- youth panel ----
+  function openYouth(){
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    const friendCount = Y.friends.length, rivalCount=Y.rivals.length;
+    p.innerHTML = `
+      <div class="sectionLabel">Childhood & Youth <span class="mini">(Minor)</span></div>
+      <div class="mini">Age ${G.age} · Respect <b>${Y.respect}</b> · Crew Power <b>${Y.crewPow}</b> · Badge <b>${Y.badge||'—'}</b></div>
+      <div class="mini">Friends ${friendCount} · Rivals ${rivalCount}</div>
+
+      <div class="hr"></div>
+      <button id="viewCrew">View Crew</button>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Daily Life</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="btnPlay">Play Outside (+2–4 happy)</button>
+        <button id="btnStories">Listen to Stories (+1 lit, +piety 20%)</button>
+        <button id="btnHelp">Help at Market (+1 charm, +respect)</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Train</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="trainCmb">Wooden Spar (+combat)</button>
+        <button id="trainLit">Reading Lesson (+literacy)</button>
+        <button id="trainChm">Village Chores (+charm)</button>
+      </div>
+      <div class="mini">Training — Combat ${Y.training.combat} · Literacy ${Y.training.literacy} · Charm ${Y.training.charm}</div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Friends & Bullies</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="btnFriend">Make a Friend</button>
+        <button id="btnBully">Deal with Bully</button>
+        <button id="btnDrill">Crew War Games (+Crew Power)</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Kid Jobs (pays coppers)</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="jobChores">Simple Chores (0–0.1g)</button>
+        <button id="jobWater">Fetch Water (0.1g, +respect)</button>
+      </div>
+    `;
+
+    // hooks
+    p.querySelector('#viewCrew')?.addEventListener('click', openCrew);
+
+    // daily life
+   p.querySelector('#btnPlay')?.addEventListener('click', ()=>{
+  addStat('happiness', R(2,4));
+  (window.renderStats ? window.renderStats() : (window.renderAll && window.renderAll())); // ← refresh sidebar
+  useFatigue();
+  if(chance(0.25)) Y.bullyMeter=Math.max(0,Y.bullyMeter-1);
+  save(); log('You play in the lane (+happiness).'); openYouth();
+});
+    p.querySelector('#btnStories')?.addEventListener('click', ()=>{
+      const gain = 1 + (Y.badge==='Bookish'?1:0);
+      Y.training.literacy += gain; if(chance(0.2)) addStat('piety',1);
+      if(!Y.badge && chance(0.25)) Y.badge='Bookish';
+      save(); log(`Old tales by candlelight (+${gain} literacy).`); openYouth();
+    });
+    p.querySelector('#btnHelp')?.addEventListener('click', ()=>{
+      Y.training.charm += 1; Y.respect += 1; useFatigue();
+      save(); log('You help at the stall (+charm, +respect).'); openYouth();
+    });
+
+    // train
+    p.querySelector('#trainCmb')?.addEventListener('click', ()=>{
+      const gain = 1 + (Y.badge==='Roughnecks'?1:0);
+      Y.training.combat += gain;
+      if(chance(0.30)) Y.gear.sticks++;
+      if(!Y.badge && chance(0.25)) Y.badge='Roughnecks';
+      save(); log(`You spar with a wooden stick (+${gain} combat).`); openYouth();
+    });
+    p.querySelector('#trainLit')?.addEventListener('click', ()=>{
+      const gain = 1 + (Y.badge==='Bookish'?1:0);
+      Y.training.literacy += gain;
+      if(!Y.badge && chance(0.25)) Y.badge='Bookish';
+      save(); log(`You trace letters carefully (+${gain} literacy).`); openYouth();
+    });
+    p.querySelector('#trainChm')?.addEventListener('click', ()=>{
+      Y.training.charm += 1; Y.respect += 1;
+      if(!Y.badge && chance(0.25)) Y.badge='Kindred';
+      save(); log('You learn manners and help neighbors (+charm, +respect).'); openYouth();
+    });
+
+    // friends
+    p.querySelector('#btnFriend')?.addEventListener('click', ()=>{
+      const names=['Tom','Alice','Joan','Hugh','Matty','Ed','Will','Meg','Rob','Nell','Kit','Pip','Bess','Hal','Giles'];
+      const charm = (G.stats?.charisma||0)/10 + Y.training.charm; // 0..10+ scale
+      const sizePenalty = Y.friends.length*6;
+      const base = 0.28; // baseline difficulty
+      const pc = clamp(base + charm/100 - sizePenalty/100, 0.07, 0.75);
+      if(chance(pc)){
+        const loyal = chance(0.25 + (Y.badge==='Kindred'?0.20:0));
+        const f={name:names[R(0,names.length-1)], str:R(1,4), loyal, role:(loyal&&chance(0.4))?'Right-hand':null};
+        Y.friends.push(f); Y.crewPow += f.str + (loyal?1:0); Y.respect += 1;
+        save(); log(`You befriend ${f.name} (crew +${f.str}${loyal?'+L':''}).`,'good'); openYouth();
+      } else {
+        addStat('happiness',-1); Y.respect=Math.max(0,Y.respect-1);
+        save(); log('Friend attempt falls flat. (-happiness, -respect)','danger'); openYouth();
+      }
+    });
+
+    p.querySelector('#btnBully')?.addEventListener('click', ()=>{
+      if(!Y.rivals.length){
+        const names=['Hob','Bran','Ivo','Rafe','Dunn','Osric','Tuck','Malk'];
+        Y.rivals.push({name:names[R(0,names.length-1)], mean:R(2,5)});
+      }
+      const r=Y.rivals[R(0,Y.rivals.length-1)];
+      const my=Y.crewPow + Y.training.combat + (Y.gear.sticks?1:0);
+      const their=r.mean + R(0,3);
+      if(my>=their){ Y.respect+=2; if(chance(0.4)) Y.rivals=Y.rivals.filter(x=>x!==r); save(); log(`You face ${r.name}. They back down.`,'good'); }
+      else { addStat('health',-R(1,3)); Y.respect=Math.max(0,Y.respect-1); save(); log(`${r.name} shoves you. (-health)`,'danger'); }
+      openYouth();
+    });
+
+    p.querySelector('#btnDrill')?.addEventListener('click', ()=>{
+      const gain = 1 + (Y.friends.length?1:0) + (Y.training.combat>3?1:0);
+      Y.crewPow += gain; if(chance(0.25)) Y.gear.slings++;
+      save(); log(`You drill in the meadow (+${gain} Crew Power).`,'good'); openYouth();
+    });
+
+    // jobs — micro-pay only
+    p.querySelector('#jobChores')?.addEventListener('click', ()=>{
+      const pay = +(Math.max(0, Math.min(0.1, (Math.random()*0.1))).toFixed(1)); // 0.0–0.1
+      addGold(pay); if(chance(0.4)) Y.respect++;
+      save(); log(`You sweep yards and carry kindling (+${pay}g).`); openYouth();
+    });
+    p.querySelector('#jobWater')?.addEventListener('click', ()=>{
+      addGold(0.1); Y.respect++;
+      save(); log('You fetch water for neighbors (+0.1g, +respect).'); openYouth();
+    });
+  }
+
+  function useFatigue(){ addStat('health', -R(0,1)); }
+
+  // ---- age up conversions / yearly ticks ----
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    const wasMinor = isMinor();
+    // minor yearly progression
+    if(wasMinor){
+      // crew grows/drifts a bit
+      Y.friends.forEach(f=>{
+        if(chance(0.60)) f.str = Math.min(6, f.str + (chance(0.30)?1:0));
+        if(!f.loyal && chance(0.12)){ // wander off
+          Y.crewPow = Math.max(0, Y.crewPow - (f.str));
+        }
+      });
+      if(chance(0.20+Y.bullyMeter*0.05)) Y.rivals.push({name:'New Bully', mean:R(2,4)});
+      if(chance(0.40)) Y.crewPow += 1;
+      save();
+    }
+
+    _ageUp?.();
+
+    // convert when turning adult
+    if(wasMinor && !isMinor()){
+      // compute conversion
+      const militia = Math.floor(Y.crewPow/2);
+      const repGain = Math.floor(Y.respect/3);
+      const goldGain = +( (0.0 + Y.friends.length*0.1 + (Math.random()*0.3+0.2)).toFixed(1) ); // a few coppers
+      const cmb = Math.floor(Y.training.combat/2);
+      const lit = Math.floor(Y.training.literacy/3) + (Y.badge==='Bookish'?1:0);
+      const trd = Math.floor(Y.training.charm/3);
+
+      // ensure army
+      if(!G.army) G.army={troops:{}, morale:50, training:0, supply:0, renown:0, banner:'None'};
+      if(militia>0) G.army.troops.militia=(G.army.troops.militia||0)+militia;
+      addRep(repGain); addGold(goldGain);
+      addSkill('combat', cmb);
+      addSkill('literacy', lit);
+      addSkill('trade', trd);
+      if(Y.gear.slings>0) G.army.training++;
+
+      log(`You come of age. ${militia} of your childhood crew enlist. (+rep ${repGain}, +${goldGain}g, +combat ${cmb}, +literacy ${lit}, +trade ${trd})`,'good');
+
+      wipeYouth();
+      applyLocks();
+    } else {
+      applyLocks();
+    }
+  };
+
+  // ---- header minor tag (nice touch) ----
+  (function tagMinor(){
+    if(document.getElementById('tagMinor')) return;
+    const hdr=document.querySelector('header'); if(!hdr) return;
+    const span=document.createElement('span'); span.id='tagMinor'; span.className='tag'; hdr.appendChild(span);
+    const _renderTop = window.renderTop;
+    window.renderTop = function(){ _renderTop?.(); span.textContent = isMinor()?'MINOR':'ADULT'; span.style.display = isMinor()?'inline-block':'none'; };
+    window.renderTop?.();
+  })();
+
+  // auto-open youth on boot
+  setTimeout(()=>{ if(isMinor()) openYouth(); applyLocks(); }, 200);
+})();
+// ===== Youth→Adult Carryover + Disable Youth After 18 (Patch) ================
+(function(){
+  if (window.YOUTH_CARRY_V1) return; window.YOUTH_CARRY_V1 = true;
+
+  const YKEY = 'ml-youth-v1';
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const log=(t,cls)=>{ const el=document.querySelector('#log'); if(!el) return;
+    const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; };
+
+  function getY(){ try{ return JSON.parse(localStorage.getItem(YKEY)||'null'); }catch(_){ return null; } }
+  function wipeY(){ try{ localStorage.removeItem(YKEY);}catch(_){} }
+
+  function ensureArmy(){ if(!G.army) G.army={troops:{}, morale:50, training:0, supply:0, renown:0, banner:'None'}; }
+  function addGold(n){ G.gold = +(Math.max(0,(G.gold||0)+n).toFixed(1)); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; }
+  function addRep(n){ G.rep = clamp((G.rep||0)+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; }
+  function addSkill(k,n){ G.skills[k] = Math.max(0,(G.skills[k]||0)+(n||0)); }
+
+  function removeYouthUI(){
+    const btn = document.getElementById('actYouth');
+    if(btn) btn.remove();
+    // Unhide adult tabs if some lock left them hidden
+    const row = document.querySelector('#actStudy')?.parentElement || document.querySelector('#activityPanel')?.previousElementSibling;
+    if(row){ row.querySelectorAll('button[id^="act"]').forEach(b=>{ if(b.dataset?.youthHidden){ b.style.display=''; b.disabled=false; delete b.dataset.youthHidden; } }); }
+    // Hide the MINOR tag if present
+    const tag=document.getElementById('tagMinor'); if(tag){ tag.style.display='none'; }
+  }
+
+  // Convert youth save Y -> adult bonuses + retinue, then wipe & hide youth
+  function convertYouthIfNeeded(reason){
+    if ((G.age||0) < 18) return false;
+    const Y = getY();
+    if (!Y) { removeYouthUI(); return false; }
+
+    // ---- conversion math ----
+    ensureArmy();
+    const militia = Math.floor((Y.crewPow||0)/2);                  // crew power -> militia
+    const repGain = Math.floor((Y.respect||0)/3);                  // respect -> reputation
+    const goldGain = +((Y.friends?.length||0)*0.1 + (Math.random()*0.3+0.2)).toFixed(1); // a few coppers
+    const cmb = Math.floor((Y.training?.combat||0)/2);
+    const lit = Math.floor((Y.training?.literacy||0)/3) + (Y.badge==='Bookish'?1:0);
+    const trd = Math.floor((Y.training?.charm||0)/3);
+
+    if (militia>0) G.army.troops.militia = (G.army.troops.militia||0)+militia;
+    addRep(repGain); addGold(goldGain);
+    addSkill('combat', cmb); addSkill('literacy', lit); addSkill('trade', trd);
+
+    // gear: a little training bump for coming prepared
+    if ((Y.gear?.slings||0)>0) G.army.training = (G.army.training||0)+1;
+
+    // Loyal friends become a small **retinue** you can use in other systems later
+    G.retinue = G.retinue || []; // [{name,str,loyal,from:'youth'}]
+    const crew = (Y.friends||[]).slice().sort((a,b)=> (b.loyal?1:0)-(a.loyal?1:0) || (b.str||0)-(a.str||0));
+    crew.slice(0,5).forEach(f=>{
+      G.retinue.push({ name:f.name, str:f.str, loyal:!!f.loyal, from:'youth' });
+    });
+
+    log(`You come of age. ${militia} crew enlist as militia. (+rep ${repGain}, +${goldGain}g, +combat ${cmb}, +literacy ${lit}, +trade ${trd}) ${G.retinue?.length?`· ${G.retinue.length} join your retinue.`:''}`, 'good');
+
+    // wipe youth & UI
+    wipeY();
+    removeYouthUI();
+    // refresh visible UI if your base has a renderer
+    if (window.renderAll) window.renderAll(); else if (window.renderStats) window.renderStats();
+    return true;
+  }
+
+  // Hook ageUp so conversion is guaranteed the moment you hit 18
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    const wasMinor = (G.age||0) < 18;
+    _ageUp?.();
+    if (wasMinor && (G.age||0) >= 18) convertYouthIfNeeded('ageUp');
+  };
+
+  // Also run once on load (covers saves that already crossed 18)
+  setTimeout(()=>{ if ((G.age||0)>=18) convertYouthIfNeeded('boot'); else { /* still minor: nothing */ } }, 200);
+
+})();
+// ===================== YOUTH EXPANSION PACK (DLC) ============================
+// Plugs into your Youth V3 system. Adds:
+// - New activities (tree climb, street games, prank rival, forage, story writing,
+//   toy carving, pet system, village fair).
+// - Collectibles & bag items (berries, herbs, wood, marbles, rare coin).
+// - Crew roles (Scout/Muscle/Speaker) with yearly effects.
+// - Minor-year events & seasonal fair.
+// - Carry-over to adulthood: pets, some loot -> gold/relics, small bonuses.
+// Safe to include multiple times (idempotent). Requires Youth V3 save key.
+// ============================================================================
+(function(){
+  if (window.YOUTH_DLC_V1) return; window.YOUTH_DLC_V1 = true;
+
+  const SAVE='ml-youth-v1';
+  const clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const chance=p=>Math.random()<p;
+  const isMinor = ()=> (window.G?.age||0) < 18;
+  const log=(t,cls)=>{ const el=document.querySelector('#log'); if(!el) return;
+    const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; };
+  const refreshUI = ()=> (window.renderStats ? window.renderStats() : (window.renderAll && window.renderAll()));
+
+  // --- youth state helpers (merge defaults so DLC can extend safely)
+  const defaults = {
+    respect:0, crewPow:0, friends:[], rivals:[],
+    gear:{slings:0,sticks:0},
+    training:{combat:0,literacy:0,charm:0},
+    bullyMeter:0, badge:null,
+    // DLC fields
+    bag:{berries:0, herbs:0, wood:0, marbles:0, coin:0},
+    pets:[],                     // [{kind:'cat'|'dog', name, bond:1..5}]
+    fair:0,                      // tickets/year flag
+    seasonTick:0,                // rotates 0..3
+    rolesVersion:1               // marker for role feature
+  };
+  function load(){
+    try{
+      const y=JSON.parse(localStorage.getItem(SAVE)||'null')||{};
+      // deep merge
+      y.gear = {...defaults.gear, ...(y.gear||{})};
+      y.training = {...defaults.training, ...(y.training||{})};
+      y.bag = {...defaults.bag, ...(y.bag||{})};
+      y.pets = Array.isArray(y.pets)?y.pets:[];
+      return Object.assign({}, defaults, y);
+    }catch(_){ return {...defaults}; }
+  }
+  function save(y){ try{ localStorage.setItem(SAVE, JSON.stringify(y)); }catch(_){} }
+
+  // --- small helpers to tweak gold/rep/stats
+  const setGold=n=>{ G.gold = +(Math.max(0,n).toFixed(1)); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; };
+  const addGold=n=> setGold((G.gold||0)+n);
+  const addStat=(k,n)=>{ G.stats[k]=clamp((G.stats[k]||0)+n,0,100); refreshUI(); };
+
+  // --- UI injection: build extra sections inside Youth panel
+  function injectDLC(){
+    if (!isMinor()) return;
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    if (p.querySelector('#yxp-root')) return; // already injected
+    const Y=load();
+
+    const root=document.createElement('div'); root.id='yxp-root';
+    root.innerHTML = `
+      <div class="hr"></div>
+      <div class="sectionLabel">Outdoors+</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="yxpClimb">Climb the Tall Tree (+health, risk)</button>
+        <button id="yxpStreet">Street Games (+happy, +crew)</button>
+        <button id="yxpForage">Forage in Woods (herbs/berries/wood)</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Mind & Make</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="yxpWrite">Write a Short Tale (+literacy, keepsake chance)</button>
+        <button id="yxpCarve">Carve a Toy (+marbles/wooden toy)</button>
+        <button id="yxpPrank">Prank a Rival (risky!)</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Pets</div>
+      <div class="mini">Pets: ${Y.pets.length?Y.pets.map(p=>`${p.name}(${p.kind}·${p.bond})`).join(' · '):'none'}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="yxpFindPet">Look for a Stray (cat/dog)</button>
+        <button id="yxpPlayPet" ${Y.pets.length? '':'disabled'}>Play with Pet (+happy)</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Crew Roles</div>
+      <div class="mini">Assign roles to friends to gain yearly bonuses.</div>
+      <div><button id="yxpRoles">Manage Roles</button></div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Village Fair</div>
+      <div class="mini">${Y.fair>0?'The fair is in town!':''}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px">
+        <button id="yxpFairGames" ${Y.fair>0?'':'disabled'}>Compete at Games (+crew/+happy)</button>
+        <button id="yxpFairTreat" ${Y.fair>0?'':'disabled'}>Buy a Sweet (0.1g)</button>
+      </div>
+
+      <div class="hr"></div>
+      <div class="sectionLabel">Your Bag</div>
+      <div class="mini">Herbs ${Y.bag.herbs} · Berries ${Y.bag.berries} · Wood ${Y.bag.wood} · Marbles ${Y.bag.marbles} · Rare Coins ${Y.bag.coin}</div>
+    `;
+    p.appendChild(root);
+
+    // ---- handlers
+    root.querySelector('#yxpClimb').onclick=()=>{
+      const Y=load();
+      if (chance(0.15)){ addStat('health', -R(1,3)); log('You slip and scrape your knee (-health).','danger'); }
+      else { addStat('health', +R(1,2)); if(chance(0.25)) Y.bag.wood++; log('You climb high and feel braver (+health).'); }
+      save(Y); reinject();
+    };
+
+    root.querySelector('#yxpStreet').onclick=()=>{
+      const Y=load();
+      addStat('happiness', R(1,3)); Y.crewPow += 1;
+      if(chance(0.10)) addStat('health', -1);
+      save(Y); log('You win at knucklebones (+happy, +crew).'); reinject();
+    };
+
+    root.querySelector('#yxpForage').onclick=()=>{
+      const Y=load();
+      const roll=R(1,100);
+      if (roll<40) { Y.bag.berries++; log('You gather berries.'); }
+      else if (roll<70){ Y.bag.herbs++; log('You find healing herbs.'); }
+      else { Y.bag.wood++; log('You collect useful sticks.'); }
+      if (chance(0.05)) { Y.bag.coin++; log('You discover an old coin!','good'); }
+      save(Y); reinject();
+    };
+
+    root.querySelector('#yxpWrite').onclick=()=>{
+      const Y=load();
+      Y.training.literacy += 1;  // stacks with V3 bonuses
+      if (chance(0.15)) Y.bag.coin++; // scribe praises you with a token
+      save(Y); log('You pen a short tale (+literacy).'); reinject();
+    };
+
+    root.querySelector('#yxpCarve').onclick=()=>{
+      const Y=load();
+      if (Y.bag.wood>0){ Y.bag.wood--; Y.bag.marbles++; log('You carve and trade a toy for marbles.'); }
+      else { log('You need a bit of wood to carve a toy.','danger'); }
+      save(Y); reinject();
+    };
+
+    root.querySelector('#yxpPrank').onclick=()=>{
+      const Y=load();
+      if(!Y.rivals.length){ log('No rivals to prank… yet.'); return; }
+      const r=Y.rivals[R(0,Y.rivals.length-1)];
+      const my = Y.training.charm + (Y.friends.length?1:0);
+      const dc = r.mean + R(0,3);
+      if(my>dc){ Y.respect+=1; log(`Your prank on ${r.name} lands (+respect).`,'good'); }
+      else{ Y.respect=Math.max(0,Y.respect-1); addStat('happiness',-1); log(`Prank backfires; ${r.name} gets even. (-happy, -respect)`,'danger'); }
+      save(Y); reinject();
+    };
+
+    root.querySelector('#yxpFindPet').onclick=()=>{
+      const Y=load();
+      if (Y.pets.length>=2){ log('Your family can only keep two pets for now.','danger'); return; }
+      if (chance(0.50)){
+        const kind=chance(0.5)?'cat':'dog';
+        const names = kind==='cat'?['Muff','Ash','Soot','Paws','Merry']:['Hound','Bark','Mug','Buddy','Rex'];
+        Y.pets.push({kind, name:names[R(0,names.length-1)], bond:1});
+        log(`A stray ${kind} follows you home!`,'good');
+      } else log('No strays today.');
+      save(Y); reinject();
+    };
+    root.querySelector('#yxpPlayPet').onclick=()=>{
+      const Y=load();
+      if (!Y.pets.length) return;
+      addStat('happiness', R(1,3)); Y.pets.forEach(p=>{ if(chance(0.4)) p.bond = Math.min(5, p.bond+1); });
+      save(Y); reinject();
+    };
+
+    root.querySelector('#yxpRoles').onclick=()=> openRoles();
+
+    root.querySelector('#yxpFairGames').onclick=()=>{
+      const Y=load(); if(!Y.fair) return;
+      Y.fair=0; Y.crewPow += R(1,2); addStat('happiness', R(1,3)); save(Y);
+      log('You shine at the fair games (+crew, +happy).','good'); reinject();
+    };
+    root.querySelector('#yxpFairTreat').onclick=()=>{
+      const Y=load(); if(!Y.fair) return;
+      if ((G.gold||0) >= 0.1){ Y.fair=0; addGold(-0.1); addStat('happiness',2); log('Sugar bun devoured (+happy).'); save(Y); reinject(); }
+      else log('You need 0.1g for a treat.','danger');
+    };
+  }
+
+  // open roles panel (simple assignment UI)
+  function openRoles(){
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    const Y=load();
+    p.innerHTML += `
+      <div id="yxp-roles" style="margin-top:8px;border:1px solid #2a2a38;border-radius:10px;padding:8px">
+        <div class="sectionLabel">Assign Crew Roles</div>
+        <div class="mini">Scouts find bits of loot; Muscle adds power; Speakers gain respect each year.</div>
+        ${(Y.friends.length?Y.friends.map((f,i)=>`
+          <div style="display:flex;gap:8px;align-items:center;margin:4px 0">
+            <div style="min-width:160px">${f.name} — STR ${f.str} ${f.loyal?'· Loyal':''}</div>
+            <select data-i="${i}">
+              <option value="">(none)</option>
+              <option ${f.role==='Scout'?'selected':''}>Scout</option>
+              <option ${f.role==='Muscle'?'selected':''}>Muscle</option>
+              <option ${f.role==='Speaker'?'selected':''}>Speaker</option>
+            </select>
+          </div>
+        `).join(''):'<i>No friends yet.</i>')}
+        <div style="margin-top:6px"><button id="yxpRolesSave">Done</button></div>
+      </div>
+    `;
+    p.querySelector('#yxpRolesSave').onclick=()=>{
+      const Y=load();
+      p.querySelectorAll('#yxp-roles select').forEach(sel=>{
+        const i=+sel.dataset.i; if(!isNaN(i) && Y.friends[i]) Y.friends[i].role = sel.value||null;
+      });
+      save(Y);
+      log('Crew roles updated.');
+      reinject(true);
+    };
+  }
+
+  // reinject the DLC UI (optionally reopen Youth fresh)
+  function reinject(full){
+    if(full){
+      const y=document.getElementById('actYouth'); if(y) y.click();
+    }else{
+      const root=document.querySelector('#yxp-root'); if(root) root.remove();
+      injectDLC();
+    }
+  }
+
+  // watch for Youth panel openings to inject the DLC
+  const mo = new MutationObserver(()=>{
+  if (!isMinor()) return;
+  // only inject if the Youth tab is the one being shown
+  const activeBtn = document.querySelector('#actYouth.active');
+  if (activeBtn) injectDLC();
+});
+  setTimeout(()=>{ const ap=document.querySelector('#activityPanel'); if(ap) mo.observe(ap, {childList:true, subtree:true}); injectDLC(); }, 200);
+
+  // ---- yearly hook: minor-only effects + seasonal fair
+  const prevAgeUp = window.ageUp;
+  window.ageUp = function(){
+    const wasMinor = isMinor();
+    const snapshot = load(); // capture pre-change for adult carry-over
+    prevAgeUp?.();
+
+    // still minor after ageUp -> run yearly DLC effects
+    if (wasMinor && isMinor()){
+      const Y=load();
+      // seasonal: every year tick season 0..3, 1/3 chance fair arrives
+      Y.seasonTick = ((Y.seasonTick||0)+1)%4;
+      if (chance(0.33)) Y.fair = 1;
+
+      // roles effects
+      (Y.friends||[]).forEach(f=>{
+        if (!f.role) return;
+        if (f.role==='Scout'){ if(chance(0.50)) Y.bag.herbs++; if(chance(0.40)) Y.bag.berries++; }
+        if (f.role==='Muscle'){ Y.crewPow += 1; }
+        if (f.role==='Speaker'){ if(chance(0.60)) Y.respect += 1; }
+      });
+
+      // pet passive happiness (tiny)
+      if ((Y.pets||[]).length) addStat('happiness', 1);
+
+      save(Y);
+      injectDLC();
+      return;
+    }
+
+    // turned adult this year -> convert DLC items (using snapshot in case core wiped)
+    if (wasMinor && !isMinor()){
+      const Y = snapshot || load() || {};
+      // Convert bag to a bit of gold + “relics”
+      let g = 0;
+      g += (Y.bag?.berries||0) * 0.05;
+      g += (Y.bag?.herbs||0)   * 0.08;
+      g += (Y.bag?.wood||0)    * 0.02;
+      g += (Y.bag?.marbles||0) * 0.02;
+      g += (Y.bag?.coin||0)    * 0.10;
+      if (g>0) addGold(+g.toFixed(1));
+
+      // Pets carry over
+      G.pets = G.pets || [];
+      (Y.pets||[]).forEach(p=> G.pets.push({kind:p.kind,name:p.name,bond:p.bond,from:'youth'}));
+
+      // Simple relics list (if you have a Relics/Heroes tab it can read these)
+      G.relics = G.relics || [];
+      if ((Y.bag?.coin||0)>0) G.relics.push({name:`Childhood Coin x${Y.bag.coin}`, from:'youth'});
+      if ((Y.bag?.marbles||0)>0) G.relics.push({name:`Marbles x${Y.bag.marbles}`, from:'youth'});
+      if ((Y.bag?.herbs||0)>0) G.relics.push({name:`Herbal Lore (${Y.bag.herbs})`, from:'youth'});
+
+      // Minor morale/training nudge if any pet bonded 4+
+      if ((Y.pets||[]).some(p=>p.bond>=4)){
+        if(!G.army) G.army={troops:{}, morale:50, training:0, supply:0, renown:0, banner:'None'};
+        G.army.morale = (G.army.morale||50)+1;
+      }
+
+      log(`Childhood mementos carried forward (+${g.toFixed(1)}g; pets: ${Y.pets?.length||0}).`,'good');
+
+      // remove Youth DLC UI and stop injecting
+      const root=document.querySelector('#yxp-root'); if(root) root.remove();
+    }
+  };
+
+})();
+// ======================= PEOPLE / CALLING CARDS (v1) =========================
+// Drop-in "social overhaul" that shows everyone you know as clickable cards.
+// - Minor-safe: limited actions if age<18
+// - Adult features: rivals, courtship, marriage, kids; soft integration with Legacy
+// - Idempotent, appends a "People" tab and hides legacy Social row when opened
+// Save key: ml-people-v1
+// ============================================================================
+(function(){
+  if (window.PeopleCardsV1) return; window.PeopleCardsV1 = true;
+
+  // ---------- glue ----------
+  const clamp = (n,a,b)=>Math.max(a,Math.min(b,n));
+  const R=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+  const chance=p=>Math.random()<p;
+  const isMinor = ()=> (window.G?.age||0) < 18;
+  const log=(t,cls)=>{ const el=document.querySelector('#log'); if(!el) return;
+    const tm=new Date().toLocaleTimeString(); el.innerHTML+=`<div class="${cls||''}">[${tm}] ${t}</div>`; el.scrollTop=el.scrollHeight; };
+  const fmt=(n)=> (n>=0?`+${n}`:`${n}`);
+  function addGold(n){ G.gold = Math.max(0, +( (G.gold||0) + n ).toFixed(1)); const g=document.querySelector('#gold'); if(g) g.textContent=G.gold; }
+  function addStat(k,n){ G.stats[k]=clamp((G.stats[k]||0)+n,0,100); if(window.renderStats) renderStats(); }
+  function addRep(n){ G.rep = clamp((G.rep||0)+n,-20,100); const r=document.querySelector('#rep'); if(r) r.textContent=G.rep; }
+
+  // ---------- save ----------
+  const SAVE='ml-people-v1';
+  const blank=()=>({ seq:1, you:{sex:(G.sex||'M')}, people:[], spouse:null, kids:[], courting:null });
+  function load(){ try{ return JSON.parse(localStorage.getItem(SAVE)||'null')||blank(); }catch(_){ return blank(); } }
+  function save(){ try{ localStorage.setItem(SAVE, JSON.stringify(S)); }catch(_){ } }
+  let S = load();
+
+  // quick find
+  const byId = id => S.people.find(p=>p.id===id);
+
+  // ---------- button ----------
+  function ensurePeopleButton(){
+    if (document.getElementById('actPeople')) return;
+    const row=document.querySelector('#actCrime')?.parentElement; if(!row) return;
+    const b=document.createElement('button'); b.id='actPeople'; b.textContent='People';
+    b.onclick=openPeople; row.appendChild(b);
+  }
+  ensurePeopleButton();
+
+  // ---------- hide old Social row (just aesthetics) ----------
+  function hideLegacySocialRow(hide=true){
+    // Try to find the row titled "Social & Family"
+    const panel=document.querySelector('#activityPanel');
+    if(!panel) return;
+    // The legacy block is usually just above Journal under Activities
+    // We can't reliably keep a handle, so we simply collapse any sectionLabel that matches:
+    document.querySelectorAll('.sectionLabel').forEach(el=>{
+      if (/social\s*&\s*family/i.test(el.textContent)) {
+        const box=el.parentElement; if(box) box.style.display = hide? 'none':'';
+      }
+    });
+  }
+
+  // ---------- helpers ----------
+  function newPerson(seed){
+    const N_M = (window.NAMES_M)||["Thomas","John","William","Hugh","Robert","Geoffrey","Peter","Walter","Richard","Alan","Adam"];
+    const N_F = (window.NAMES_F)||["Matilda","Alice","Eleanor","Isabel","Joan","Agnes","Margery","Cecily","Emma","Beatrice","Edith"];
+    const SN = (window.SURNAMES)||["of Ashford","the Miller","of York","the Smith","of Dunwich","the Baker","of Kent","of Wye","the Tanner","of Fens"];
+    const sex = seed?.sex || (Math.random()<0.5?'M':'F');
+    const first = sex==='F'?N_F[R(0,N_F.length-1)]:N_M[R(0,N_M.length-1)];
+    const name = `${first} ${SN[R(0,SN.length-1)]}`;
+    const traits = [];
+    if(chance(0.25)) traits.push('Bold');
+    if(chance(0.25)) traits.push('Shy');
+    if(chance(0.20)) traits.push('Pious');
+    return {
+      id: S.seq++,
+      name, sex,
+      rel: R(20,40),          // relation 0..100
+      trust: 0,               // -5..+5
+      tags: traits,           // small descriptors
+      role: 'acquaintance',   // acquaintance | friend | rival | spouse | prospect
+      history: 0              // years known
+    };
+  }
+  function relationshipBump(p,base){
+    let v=base;
+    if(p.tags?.includes('Shy')) v -= 1;
+    if(p.tags?.includes('Bold')) v += 1;
+    v += Math.floor((G.stats?.charisma||0)/30); // your charm helps
+    p.rel = clamp(p.rel + v, 0, 100);
+    return v;
+  }
+
+  // ---------- actions ----------
+  function meetNew(){
+    const p=newPerson(); S.people.push(p); save(); log(`You meet ${p.name}.`,'good'); openPeople();
+  }
+  function visit(id){
+    const p=byId(id); if(!p) return;
+    const delta = relationshipBump(p, R(1,3));
+    p.history++; save();
+    log(`You spend time with ${p.name} (${fmt(delta)} relation).`);
+    openCard(id);
+  }
+  function smallGift(id){
+    if((G.gold||0)<0.1) return log('You need 0.1g for a gift.','danger');
+    addGold(-0.1);
+    const p=byId(id); if(!p) return;
+    const delta = relationshipBump(p, R(2,5));
+    save(); log(`You give ${p.name} a thoughtful gift (${fmt(delta)} relation).`,'good');
+    openCard(id);
+  }
+  function rivalize(id){
+    const p=byId(id); if(!p) return;
+    p.role='rival'; p.rel=Math.min(p.rel, 40); save();
+    log(`${p.name} is now a rival.`,'danger'); openCard(id);
+  }
+  function befriend(id){
+    const p=byId(id); if(!p) return;
+    if(p.rel<50) return log('They aren’t close enough yet (need 50+).','danger');
+    p.role='friend'; p.trust = clamp(p.trust+1,-5,5); save();
+    log(`${p.name} becomes your friend.`,'good'); openCard(id);
+  }
+  function court(id){
+    const p=byId(id); if(!p) return;
+    if(isMinor()) return log('You are too young for courtship.','danger');
+    if(p.sex===G.sex && !window.AllowSameMarriage) return log('Your realm forbids this match (toggle AllowSameMarriage to bypass).','danger');
+    if(p.rel<60) return log('Grow closer first (60+).','danger');
+    S.courting = id; p.role='prospect'; save();
+    log(`You begin courting ${p.name}.`,'good'); openCard(id);
+  }
+  function propose(id){
+    const p=byId(id); if(!p) return;
+    if(S.spouse) return log('You are already wed.','danger');
+    if(p.rel<75) return log('They need to be very fond of you (75+).','danger');
+    // modest dowry cost
+    if((G.gold||0)<1) return log('A simple wedding feast needs 1g.','danger');
+    addGold(-1);
+    p.role='spouse'; S.spouse=id; S.courting=null; save();
+    log(`You marry ${p.name}.`,'good'); openPeople();
+    if(window.LegacyExt) try{ addRep(2); }catch(_){}
+  }
+  function tryForChild(){
+    if(isMinor()) return log('Not appropriate at your age.','danger');
+    if(!S.spouse) return log('You are not married.','danger');
+    const sp = byId(S.spouse); if(!sp) return;
+    // chance up with relationship & happiness
+    const p = Math.min(0.55, 0.20 + (sp.rel/300) + ((G.stats?.happiness||0)/400));
+    if(chance(p)){
+      const sex = Math.random()<0.5?'M':'F';
+      const N_M = (window.NAMES_M)||["Thomas","John","William","Hugh","Robert","Geoffrey","Peter","Walter","Richard","Alan","Adam"];
+      const N_F = (window.NAMES_F)||["Matilda","Alice","Eleanor","Isabel","Joan","Agnes","Margery","Cecily","Emma","Beatrice","Edith"];
+      const first = sex==='F'?N_F[R(0,N_F.length-1)]:N_M[R(0,N_M.length-1)];
+      const baby = { id:`kid-${Date.now()}`, name:first, sex, age:0 };
+      S.kids.push(baby); save();
+      log(`A child is born: ${baby.name}.`,'good'); openPeople();
+      // tiny happiness
+      addStat('happiness',2);
+    } else {
+      log('No child this year.','mini');
+    }
+  }
+
+  function openCard(id){
+    const p=byId(id); if(!p) return openPeople();
+    const minor = isMinor();
+    const wrap=document.querySelector('#activityPanel'); if(!wrap) return;
+    hideLegacySocialRow(true);
+    wrap.innerHTML = `
+      <div class="sectionLabel">Card — ${p.name}</div>
+      <div class="mini">Relation <b>${p.rel}</b> · Trust ${p.trust>=0?`+${p.trust}`:p.trust} · ${p.tags?.join(' · ')||'—'} · ${p.role}</div>
+      <div class="hr"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="pcBack">← People</button>
+        <button id="pcVisit">Visit</button>
+        <button id="pcGift">Small Gift (0.1g)</button>
+        <button id="pcBef" ${p.rel>=50?'':'disabled'}>Make Friend</button>
+        <button id="pcRival">Set Rival</button>
+        <button id="pcCourt" ${(!minor&&p.rel>=60)?'':'disabled'}>Court</button>
+        <button id="pcPropose" ${(!minor && S.courting===p.id && p.rel>=75 && !S.spouse)?'':'disabled'}>Propose</button>
+      </div>
+      <div class="hr"></div>
+      <div class="mini">Years known: ${p.history}</div>
+    `;
+    wrap.querySelector('#pcBack').onclick=openPeople;
+    wrap.querySelector('#pcVisit').onclick=()=>visit(p.id);
+    wrap.querySelector('#pcGift').onclick=()=>smallGift(p.id);
+    wrap.querySelector('#pcBef').onclick=()=>befriend(p.id);
+    wrap.querySelector('#pcRival').onclick=()=>rivalize(p.id);
+    wrap.querySelector('#pcCourt').onclick=()=>court(p.id);
+    wrap.querySelector('#pcPropose').onclick=()=>propose(p.id);
+  }
+
+  // ---------- main panel ----------
+  function openPeople(){
+    const p=document.querySelector('#activityPanel'); if(!p) return;
+    hideLegacySocialRow(true);
+    const minor = isMinor();
+    const list = S.people.slice().sort((a,b)=> (b.rel - a.rel) || (a.name>b.name?1:-1));
+    const cards = list.map(person=>`
+      <div class="card" data-id="${person.id}" style="border:1px solid #2a3046;border-radius:12px;padding:8px;min-width:210px">
+        <div style="font-weight:600">${person.name}</div>
+        <div class="mini">Rel ${person.rel} · ${person.role}</div>
+        <div class="mini">${person.tags?.join(' · ')||'—'}</div>
+        <div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">
+          <button data-act="open" data-id="${person.id}">Open</button>
+          <button data-act="visit" data-id="${person.id}">Visit</button>
+          <button data-act="gift" data-id="${person.id}">Gift</button>
+        </div>
+      </div>
+    `).join('');
+
+    p.innerHTML = `
+      <div class="sectionLabel">People — Calling Cards</div>
+      <div class="mini">Known: <b>${S.people.length}</b> · Spouse: <b>${S.spouse?byId(S.spouse)?.name||'—':'—'}</b> · Kids: <b>${S.kids.length}</b></div>
+      <div class="hr"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="ppMeet">Meet New</button>
+        <button id="ppChild" ${(!minor && S.spouse)?'':'disabled'}>Have a Child (try)</button>
+        <button id="ppSync" class="mini">Sync Family Names</button>
+        <button id="ppShowLegacy" class="mini">Show Legacy Social Row</button>
+      </div>
+      <div class="hr"></div>
+      <div id="pcGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px"></div>
+    `;
+    p.querySelector('#ppMeet').onclick=meetNew;
+    p.querySelector('#ppChild').onclick=tryForChild;
+    p.querySelector('#ppShowLegacy').onclick=()=>hideLegacySocialRow(false);
+
+    // heuristic import from the Relationships box (right column) — optional
+    p.querySelector('#ppSync').onclick=()=>{
+      const names=[];
+      // Because HTML varies, we just scan for right-column list items that look like "Name (mother/father/sibling)"
+      document.querySelectorAll('*').forEach(el=>{
+        const t=el.textContent?.trim()||'';
+        if(/\(mother\)|\(father\)|\(sibling\)/i.test(t) && t.length<64) names.push(t.replace(/\s*\(.*?\)\s*/,'').trim());
+      });
+      let added=0;
+      names.forEach(n=>{
+        if(!S.people.some(q=>q.name===n)){
+          const sex = /a$|ice$|ah$|ia$|is$|yn$|ette$|ina$/i.test(n.split(' ')[0]) ? 'F' : 'M';
+          const p = newPerson({sex}); p.name=n; p.rel=R(40,65); p.role='friend'; S.people.push(p); added++;
+        }
+      });
+      save(); log(`Synced ${added} family names into People.`, added? 'good':'');
+      openPeople();
+    };
+
+    const grid=p.querySelector('#pcGrid'); grid.innerHTML=cards||'<i>No known people. Click “Meet New”.</i>';
+    grid.addEventListener('click', (e)=>{
+      const b=e.target.closest('button'); if(!b) return;
+      const id=parseInt(b.dataset.id,10); const act=b.dataset.act;
+      if(act==='open') return openCard(id);
+      if(act==='visit') return visit(id);
+      if(act==='gift')  return smallGift(id);
+    });
+  }
+
+  // ---------- yearly drift & family aging ----------
+  const _ageUp = window.ageUp;
+  window.ageUp = function(){
+    // pre
+    const wasMinor=isMinor();
+    _ageUp?.();
+    // drift each year
+    S.people.forEach(p=>{
+      // gentle decay unless you visited a lot
+      p.rel = clamp(p.rel - R(0,2) + (p.role==='friend'?1:0), 0, 100);
+      p.history++;
+      if(p.role==='rival' && chance(0.15)) p.rel = clamp(p.rel - R(1,3), 0, 100);
+    });
+    // kids get older
+    (S.kids||[]).forEach(k=>k.age=(k.age||0)+1);
+    save();
+  };
+
+  // also open on hotkey P
+  document.addEventListener('keydown', e=>{ if(e.key.toLowerCase()==='p') openPeople(); });
+
+  // boot
+  setTimeout(()=>{ ensurePeopleButton(); }, 200);
+
+})();
+
+</script>
+</body>
+</html>
